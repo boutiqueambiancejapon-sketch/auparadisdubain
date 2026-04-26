@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Au Paradis du Bain — Cosmétiques de bain artisanaux</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="styles.css" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="data.js"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="Bubbles.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="HomePage.jsx"></script>
+<script type="text/babel" src="CollectionPage.jsx"></script>
+<script type="text/babel" src="ProductPage.jsx"></script>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "palette": "cool",
+  "bubbles": true,
+  "trail": false,
+  "density": 18
+}/*EDITMODE-END*/;
+
+const { Header, Footer, BubbleField, useBubblePop, useBubbleTrail, HomePage, CollectionPage, ProductPage } = window;
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [route, setRoute] = React.useState({ name: "home" });
+  const [cart, setCart] = React.useState(2);
+
+  // Apply palette to document
+  React.useEffect(() => {
+    if (t.palette === "pastel") document.documentElement.removeAttribute("data-palette");
+    else document.documentElement.setAttribute("data-palette", t.palette);
+  }, [t.palette]);
+
+  useBubblePop();
+  useBubbleTrail(t.trail);
+
+  const navigate = (name, payload) => {
+    if (name === "collection") setRoute({ name: "collection", id: payload || "bombes" });
+    else if (name === "product") setRoute({ name: "product", product: payload });
+    else setRoute({ name: "home" });
+    window.scrollTo({ top: 0, behavior: "instant" });
+  };
+
+  const openProduct = (p) => navigate("product", p);
+
+  return (
+    <>
+      {t.bubbles && <BubbleField density={t.density} />}
+      <div style={{ position: "relative", zIndex: 2 }}>
+        <Header onNav={navigate} route={route.name} cartCount={cart} />
+        <div data-screen-label={route.name === "home" ? "01 Home" : route.name === "collection" ? "02 Collection" : "03 Product"}>
+          {route.name === "home" && <HomePage onNav={navigate} onOpen={openProduct} />}
+          {route.name === "collection" && <CollectionPage collectionId={route.id} onOpen={openProduct} onNav={navigate} />}
+          {route.name === "product" && <ProductPage product={route.product} onOpen={openProduct} onNav={navigate} />}
+        </div>
+        <Footer />
+      </div>
+
+      <TweaksPanel>
+        <TweakSection label="Palette" />
+        <TweakRadio label="Couleur" value={t.palette}
+          options={[
+            { value: "pastel", label: "Rose poudré" },
+            { value: "cool", label: "Mint & lavande" },
+            { value: "candy", label: "Bonbon" },
+          ]}
+          onChange={v => setTweak("palette", v)} />
+        <TweakSection label="Animations" />
+        <TweakToggle label="Bulles d'arrière-plan" value={t.bubbles}
+          onChange={v => setTweak("bubbles", v)} />
+        <TweakSlider label="Densité" value={t.density} min={4} max={40} step={2}
+          onChange={v => setTweak("density", v)} />
+        <TweakToggle label="Traînée de bulles au curseur" value={t.trail}
+          onChange={v => setTweak("trail", v)} />
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
