@@ -1,0 +1,198 @@
+<section class="bundles">
+  <div class="container">
+    <div class="bundles__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="eyebrow" style="margin-bottom: 12px;">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="h-serif bundles__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="grid cols-3 bundles__grid">
+      {%- for block in section.blocks -%}
+        {%- assign p = all_products[block.settings.product] -%}
+        {%- assign swatch = block.settings.swatch | default: 'pink' -%}
+        {%- assign tag = block.settings.tag | default: 'Coffret signature' -%}
+        {%- assign story = block.settings.story | default: p.metafields.custom.story -%}
+
+        {%- comment -%}
+          Includes can come from a metafield (list.single_line_text) on the
+          product, or be entered manually in the block as a comma list.
+        {%- endcomment -%}
+        {%- assign includes_meta = p.metafields.custom.includes.value -%}
+        {%- if includes_meta != blank -%}
+          {%- assign includes = includes_meta -%}
+        {%- else -%}
+          {%- assign includes = block.settings.includes_text | split: ',' -%}
+        {%- endif -%}
+
+        {%- assign card_url = block.settings.url | default: p.url -%}
+
+        <div class="card bundle" {{ block.shopify_attributes }}>
+          <div class="bundle__media bundle__media--{{ swatch }}">
+            <div class="bundle__box">
+              {%- if p.featured_image != blank -%}
+                {{ p.featured_image | image_url: width: 600 | image_tag: alt: p.title, loading: 'lazy' }}
+              {%- else -%}
+                <span>// coffret</span>
+              {%- endif -%}
+            </div>
+            {%- if tag != blank -%}
+              <span class="tag tag-{{ swatch }} bundle__tag" style="background: #fff;">{{ tag }}</span>
+            {%- endif -%}
+          </div>
+
+          <div class="bundle__body">
+            <h3 class="h-display bundle__title">{{ block.settings.title_override | default: p.title | default: 'Coffret' }}</h3>
+            {%- if story != blank -%}
+              <p class="bundle__story">{{ story }}</p>
+            {%- endif -%}
+
+            {%- if includes != blank and includes.size > 0 -%}
+              <ul class="bundle__includes">
+                {%- for item in includes -%}
+                  <li>+ {{ item | strip }}</li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+
+            <div class="bundle__footer">
+              <div>
+                {%- if p.price -%}
+                  <span class="bundle__price">{{ p.price | money }}</span>
+                  {%- if p.compare_at_price > p.price -%}
+                    <span class="bundle__was">{{ p.compare_at_price | money }}</span>
+                  {%- endif -%}
+                {%- elsif block.settings.price_text != blank -%}
+                  <span class="bundle__price">{{ block.settings.price_text }}</span>
+                  {%- if block.settings.was_text != blank -%}
+                    <span class="bundle__was">{{ block.settings.was_text }}</span>
+                  {%- endif -%}
+                {%- endif -%}
+              </div>
+              <a href="{{ card_url | default: '#' }}" class="btn btn-sm">Offrir →</a>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .bundles { padding: 100px 0; background: var(--bg-soft); border-radius: var(--radius-xl); margin: 0 16px; }
+  .bundles__head { text-align: center; margin-bottom: 48px; }
+  .bundles__heading { font-size: clamp(40px, 5vw, 64px); max-width: 700px; margin: 0 auto; }
+  .bundles__grid { padding: 0 16px; }
+
+  .bundle { padding: 28px; background: #fff; }
+  .bundle__media {
+    position: relative; border-radius: var(--radius-md); overflow: hidden;
+    aspect-ratio: 1 / 0.9; padding: 24px;
+    display: grid; place-items: center;
+  }
+  .bundle__media--pink    { background: #FFE9EE; }
+  .bundle__media--vanilla { background: #FFF3DC; }
+  .bundle__media--mint    { background: #E2F7EE; }
+  .bundle__media--lilac   { background: #EAE3FC; }
+
+  .bundle__box {
+    width: 60%; aspect-ratio: 1 / 1.2; background: rgba(255,255,255,0.6);
+    border: 2px solid var(--ink); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft);
+    transform: rotate(-2deg); overflow: hidden;
+  }
+  .bundle__box img { width: 100%; height: 100%; object-fit: cover; }
+  .bundle__media--pink    .bundle__box { border-color: var(--pink-deep); }
+  .bundle__media--vanilla .bundle__box { border-color: var(--vanilla-deep); }
+  .bundle__media--mint    .bundle__box { border-color: var(--mint-deep); }
+  .bundle__media--lilac   .bundle__box { border-color: var(--lilac-deep); }
+
+  .bundle__tag { position: absolute; top: 16px; left: 16px; }
+  .bundle__body { margin-top: 20px; }
+  .bundle__title { font-size: 28px; margin-bottom: 10px; }
+  .bundle__story { font-size: 13px; color: var(--ink-soft); margin-bottom: 14px; line-height: 1.5; }
+  .bundle__includes { list-style: none; margin-bottom: 18px; font-size: 13px; color: var(--ink-soft); }
+  .bundle__includes li { padding: 6px 0; }
+  .bundle__includes li + li { border-top: 1px dashed var(--line-strong); }
+  .bundle__footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .bundle__price { font-size: 22px; font-weight: 600; }
+  .bundle__was { font-size: 13px; color: var(--ink-mute); text-decoration: line-through; margin-left: 8px; }
+
+  @media (max-width: 900px) {
+    .bundles { padding: 60px 0; margin: 0 8px; border-radius: var(--radius-lg); }
+    .bundles__grid { padding: 0 8px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Coffrets cadeaux",
+  "tag": "section",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "· Coffrets cadeaux" },
+    { "type": "text", "id": "heading", "label": "Titre",
+      "default": "L'art d'offrir le bain, emballé à la main." }
+  ],
+  "blocks": [
+    {
+      "type": "bundle",
+      "name": "Coffret",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Produit coffret (optionnel)" },
+        { "type": "text",    "id": "title_override", "label": "Titre (écrase le produit)" },
+        { "type": "text",    "id": "tag",   "label": "Étiquette",     "default": "Coffret signature" },
+        { "type": "textarea","id": "story", "label": "Histoire courte" },
+        {
+          "type": "textarea", "id": "includes_text",
+          "label": "Contenu (séparé par des virgules)",
+          "info": "Utilisé si le produit n'a pas de metafield custom.includes"
+        },
+        { "type": "text", "id": "price_text", "label": "Prix manuel (si pas de produit)" },
+        { "type": "text", "id": "was_text",   "label": "Prix barré manuel" },
+        { "type": "url",  "id": "url",        "label": "Lien (écrase l'URL produit)" },
+        {
+          "type": "select", "id": "swatch", "label": "Couleur", "default": "pink",
+          "options": [
+            { "value": "pink",    "label": "Rose" },
+            { "value": "vanilla", "label": "Vanille" },
+            { "value": "mint",    "label": "Mint" },
+            { "value": "lilac",   "label": "Lilas" }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Coffrets cadeaux",
+      "blocks": [
+        { "type": "bundle", "settings": {
+            "title_override": "Le Rituel du Dimanche",
+            "tag": "Coffret signature",
+            "story": "Trois temps pour s'offrir une parenthèse : effervescence, infusion, hydratation.",
+            "includes_text": "Nuage Rose, Sel d'Hokkaido, Lait de Lune",
+            "price_text": "78€", "was_text": "94€", "swatch": "pink"
+        } },
+        { "type": "bundle", "settings": {
+            "title_override": "Escapade Provence",
+            "tag": "Made in France",
+            "story": "Un voyage olfactif entre les champs de lavande et les marchés provençaux.",
+            "includes_text": "Bain de Lavande, Vanille Givrée, Pétales d'Aube",
+            "price_text": "92€", "was_text": "112€", "swatch": "lilac"
+        } },
+        { "type": "bundle", "settings": {
+            "title_override": "Découverte Mini",
+            "tag": "Idée cadeau",
+            "story": "Six fragrances en miniature, parfaites pour explorer notre univers.",
+            "includes_text": "6 bombes mini, Pochon en lin",
+            "price_text": "42€", "was_text": "54€", "swatch": "mint"
+        } }
+      ]
+    }
+  ]
+}
+{% endschema %}
