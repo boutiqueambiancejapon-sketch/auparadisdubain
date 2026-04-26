@@ -106,8 +106,7 @@
         {%- endif -%}
       </div>
 
-      <!-- Variant pickers, ATC, trust signals — Stage 5b -->
-      <div data-product-form-slot></div>
+      {%- render 'product-form', product: p, section: section -%}
     </div>
   </div>
 </section>
@@ -194,6 +193,8 @@
 {
   "name": "Page produit",
   "tag": "section",
-  "settings": []
+  "settings": [
+    { "type": "checkbox", "id": "show_trust_badges", "label": "Afficher les badges de confiance", "default": true }
+  ]
 }
 {% endschema %}

@@ -1,0 +1,344 @@
+{%- comment -%}
+  Variant pickers + quantity + add-to-cart + trust badges.
+  Rendered into the product-info column of sections/main-product.liquid.
+
+  Args:
+    product: Shopify product (required)
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+{%- form 'product', product, id: 'ProductForm', class: 'product-form', novalidate: 'novalidate' -%}
+  <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id-input>
+
+  {%- for option in product.options_with_values -%}
+    {%- assign option_name_lc = option.name | downcase -%}
+    {%- assign option_index = forloop.index0 -%}
+    {%- assign is_fragrance = false -%}
+    {%- if option_name_lc contains 'fragrance' or option_name_lc contains 'parfum' or option_name_lc contains 'scent' -%}
+      {%- assign is_fragrance = true -%}
+    {%- endif -%}
+
+    <div class="product-form__option" data-product-option data-option-index="{{ option_index }}">
+      <div class="product-form__option-head">
+        <span>{{ option.name }}</span>
+        <span class="product-form__option-current" data-option-current>{{ option.selected_value }}</span>
+      </div>
+
+      {%- if is_fragrance -%}
+        <div class="product-form__swatches">
+          {%- for value in option.values -%}
+            {%- assign palette = 'pink,lilac,vanilla,mint' | split: ',' -%}
+            {%- assign palette_color = palette[forloop.index0 | modulo: 4] -%}
+            <label class="fragrance-swatch {% if value == option.selected_value %}is-active{% endif %}"
+                   title="{{ value }}">
+              <input type="radio"
+                     name="options[{{ option.name | escape }}]"
+                     value="{{ value | escape }}"
+                     {% if value == option.selected_value %}checked{% endif %}
+                     data-option-input data-option-label="{{ value | escape }}"
+                     hidden>
+              <span class="fragrance-swatch__dot"
+                    style="background: radial-gradient(circle at 30% 30%, #fff, var(--{{ palette_color }}-deep));"></span>
+              <span class="visually-hidden">{{ value }}</span>
+            </label>
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        <div class="product-form__pickers">
+          {%- for value in option.values -%}
+            {%- comment -%}
+              Find the variant matching this option value (using the
+              currently selected values for the other options) so we can
+              show a per-value price hint when format names embed grams.
+            {%- endcomment -%}
+            <label class="product-picker {% if value == option.selected_value %}is-active{% endif %}">
+              <input type="radio"
+                     name="options[{{ option.name | escape }}]"
+                     value="{{ value | escape }}"
+                     {% if value == option.selected_value %}checked{% endif %}
+                     data-option-input data-option-label="{{ value | escape }}"
+                     hidden>
+              <span class="product-picker__main">{{ value }}</span>
+            </label>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+
+  <div class="product-form__buy">
+    <div class="quantity-input">
+      <button type="button" class="quantity-input__btn" data-qty-decrement aria-label="Diminuer la quantité">−</button>
+      <input type="number" name="quantity" value="1" min="1" inputmode="numeric"
+             class="quantity-input__field" data-qty-input>
+      <button type="button" class="quantity-input__btn" data-qty-increment aria-label="Augmenter la quantité">+</button>
+    </div>
+
+    <button type="submit"
+            name="add"
+            class="btn product-form__submit"
+            {% unless current_variant.available %}disabled{% endunless %}
+            data-atc-button>
+      <span data-atc-default>
+        {%- if current_variant.available -%}
+          {{ 'products.product.add_to_cart' | t }} · <span data-atc-price>{{ current_variant.price | money }}</span>
+        {%- else -%}
+          {{ 'products.product.sold_out' | t }}
+        {%- endif -%}
+      </span>
+      <span data-atc-success hidden>{{ 'products.product.added' | t }}</span>
+    </button>
+  </div>
+
+  <button type="button" class="btn btn-secondary product-form__wishlist" data-wishlist-toggle>
+    {{ 'products.product.wishlist' | t }}
+  </button>
+{%- endform -%}
+
+{%- if section.settings.show_trust_badges == false -%}{%- else -%}
+  <div class="product-trust">
+    {%- assign default_badges = 'Cosmos Organic|Bio certifié|🌿,Vegan & cruelty-free|Sans test animal|🐰,Livraison 48h|Offerte dès 60€|📦,Emballage compostable|Zéro plastique|♻️' | split: ',' -%}
+    {%- for raw in default_badges -%}
+      {%- assign parts = raw | split: '|' -%}
+      <div class="product-trust__item">
+        <span class="product-trust__icon">{{ parts[2] }}</span>
+        <div>
+          <div class="product-trust__title">{{ parts[0] }}</div>
+          <div class="product-trust__sub">{{ parts[1] }}</div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+{%- endif -%}
+
+{%- comment -%}
+  Variant data dumped for client-side picker → variant resolution.
+  Filter out anything but {id, available, options, price, compare_at_price}.
+{%- endcomment -%}
+<script type="application/json" data-variants-json>
+  [
+    {%- for v in product.variants -%}
+      {
+        "id": {{ v.id | json }},
+        "available": {{ v.available | json }},
+        "options": {{ v.options | json }},
+        "price": {{ v.price | json }},
+        "compare_at_price": {{ v.compare_at_price | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+</script>
+
+<style>
+  .product-form { display: flex; flex-direction: column; gap: 0; }
+
+  .product-form__option { margin-bottom: 24px; }
+  .product-form__option-head {
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 13px; font-weight: 600; margin-bottom: 10px;
+  }
+  .product-form__option-current { color: var(--ink-soft); font-weight: 400; }
+
+  /* Format-style picker */
+  .product-form__pickers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .product-picker {
+    padding: 14px 8px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--line-strong);
+    background: transparent; font-size: 12px; font-weight: 500;
+    text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .product-picker:hover { border-color: var(--ink); }
+  .product-picker.is-active { border-color: var(--ink); background: var(--bg-soft); }
+  .product-picker__main { display: block; }
+  .product-picker__price { display: block; color: var(--ink-soft); font-weight: 400; margin-top: 2px; }
+
+  /* Fragrance-style swatch */
+  .product-form__swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+  .fragrance-swatch {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 2px solid transparent; padding: 2px;
+    cursor: pointer; transition: border-color .2s;
+  }
+  .fragrance-swatch:hover { border-color: var(--line-strong); }
+  .fragrance-swatch.is-active { border-color: var(--ink); }
+  .fragrance-swatch__dot { display: block; width: 100%; height: 100%; border-radius: 50%; border: 1px solid rgba(0,0,0,0.06); }
+
+  /* Quantity + ATC */
+  .product-form__buy { display: flex; gap: 12px; margin-bottom: 16px; align-items: stretch; }
+  .quantity-input {
+    display: flex; align-items: center; height: 52px;
+    border: 1.5px solid var(--line-strong); border-radius: 999px;
+  }
+  .quantity-input__btn {
+    padding: 0 18px; font-size: 18px; height: 100%;
+    background: none; cursor: pointer;
+  }
+  .quantity-input__field {
+    width: 40px; text-align: center; font-weight: 600;
+    background: none; border: 0; padding: 0; outline: none;
+    height: 100%; -moz-appearance: textfield;
+  }
+  .quantity-input__field::-webkit-outer-spin-button,
+  .quantity-input__field::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .product-form__submit { flex: 1; transition: background .25s; }
+  .product-form__submit.is-success { background: var(--mint-deep); color: var(--ink); }
+  .product-form__submit[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+  .product-form__wishlist { width: 100%; margin-bottom: 32px; }
+
+  /* Trust badges */
+  .product-trust {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    font-size: 13px; margin-top: 8px;
+  }
+  .product-trust__item {
+    display: flex; gap: 10px; padding: 12px;
+    background: var(--bg-soft); border-radius: var(--radius-md);
+  }
+  .product-trust__icon { font-size: 20px; flex-shrink: 0; }
+  .product-trust__title { font-weight: 600; }
+  .product-trust__sub { color: var(--ink-soft); font-size: 12px; }
+</style>
+
+<script>
+  (function () {
+    const form = document.getElementById('ProductForm');
+    if (!form) return;
+    const variants = JSON.parse(form.parentElement.querySelector('[data-variants-json]').textContent || '[]');
+    const variantInput = form.querySelector('[data-variant-id-input]');
+    const priceTarget = form.querySelector('[data-atc-price]');
+    const headerPrice = document.querySelector('[data-product-price] .product-info__price-current');
+    const headerWas   = document.querySelector('[data-product-price] .product-info__price-was');
+    const atcBtn = form.querySelector('[data-atc-button]');
+    const atcDefault = atcBtn.querySelector('[data-atc-default]');
+    const atcSuccess = atcBtn.querySelector('[data-atc-success]');
+
+    function moneyFormat(cents) {
+      const fmt = (window.themeSettings && window.themeSettings.moneyFormat) || '€{{amount}}';
+      const amount = (cents / 100).toFixed(2).replace('.', ',');
+      return fmt.replace(/\{\{\s*amount[^}]*\}\}/, amount);
+    }
+
+    function getSelectedOptions() {
+      return Array.from(form.querySelectorAll('[data-product-option]')).map((group) => {
+        const checked = group.querySelector('input[type="radio"]:checked');
+        return checked ? checked.value : null;
+      });
+    }
+
+    function findVariant(opts) {
+      return variants.find(v => v.options.length === opts.length
+        && v.options.every((o, i) => o === opts[i]));
+    }
+
+    function syncOptionLabel(group) {
+      const checked = group.querySelector('input[type="radio"]:checked');
+      const label = group.querySelector('[data-option-current]');
+      if (checked && label) label.textContent = checked.dataset.optionLabel || checked.value;
+    }
+
+    function syncActiveStyles(group) {
+      group.querySelectorAll('.product-picker, .fragrance-swatch').forEach((el) => {
+        const input = el.querySelector('input[type="radio"]');
+        el.classList.toggle('is-active', !!(input && input.checked));
+      });
+    }
+
+    function update() {
+      const groups = form.querySelectorAll('[data-product-option]');
+      groups.forEach((g) => { syncOptionLabel(g); syncActiveStyles(g); });
+
+      const opts = getSelectedOptions();
+      const variant = findVariant(opts);
+      if (!variant) return;
+
+      variantInput.value = variant.id;
+
+      if (priceTarget) priceTarget.textContent = moneyFormat(variant.price);
+      if (headerPrice) headerPrice.textContent = moneyFormat(variant.price);
+      if (headerWas) {
+        if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+          headerWas.textContent = moneyFormat(variant.compare_at_price);
+          headerWas.style.display = '';
+        } else {
+          headerWas.style.display = 'none';
+        }
+      }
+
+      atcBtn.disabled = !variant.available;
+      atcDefault.firstChild && (atcDefault.firstChild.nodeValue = variant.available
+        ? "{{ 'products.product.add_to_cart' | t }} · "
+        : "{{ 'products.product.sold_out' | t }}");
+
+      const url = new URL(window.location.href);
+      url.searchParams.set('variant', variant.id);
+      history.replaceState({}, '', url);
+    }
+
+    form.addEventListener('change', (e) => {
+      if (e.target.matches('[data-option-input]')) update();
+    });
+
+    /* Quantity */
+    const qty = form.querySelector('[data-qty-input]');
+    form.querySelector('[data-qty-decrement]').addEventListener('click', () => {
+      qty.value = Math.max(1, parseInt(qty.value, 10) - 1);
+    });
+    form.querySelector('[data-qty-increment]').addEventListener('click', () => {
+      qty.value = parseInt(qty.value, 10) + 1;
+    });
+
+    /* ATC: AJAX submit so the user stays on the page; falls back to normal post on error */
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      atcBtn.disabled = true;
+      try {
+        const fd = new FormData(form);
+        const res = await fetch(window.themeSettings.routes.cart_add_url + '.js', {
+          method: 'POST',
+          body: fd,
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error('add failed');
+
+        atcDefault.hidden = true;
+        atcSuccess.hidden = false;
+        atcBtn.classList.add('is-success');
+
+        /* Bump the header cart counter */
+        const cartRes = await fetch(window.themeSettings.routes.cart_url + '.js', { headers: { 'Accept': 'application/json' } });
+        if (cartRes.ok) {
+          const cart = await cartRes.json();
+          const counter = document.querySelector('[data-cart-count]');
+          if (counter) counter.textContent = cart.item_count;
+        }
+
+        setTimeout(() => {
+          atcDefault.hidden = false;
+          atcSuccess.hidden = true;
+          atcBtn.classList.remove('is-success');
+          atcBtn.disabled = false;
+        }, 1800);
+      } catch (err) {
+        atcBtn.disabled = false;
+        form.removeEventListener('submit', arguments.callee);
+        form.submit();
+      }
+    });
+
+    /* Wishlist (visual only — no Shopify-native wishlist) */
+    const wishlist = form.querySelector('[data-wishlist-toggle]');
+    if (wishlist) {
+      wishlist.addEventListener('click', () => {
+        wishlist.style.background = 'var(--pink)';
+        wishlist.style.borderColor = 'var(--pink-deep)';
+        wishlist.textContent = '♥ Ajouté à la liste';
+      });
+    }
+
+    update();
+  })();
+</script>
