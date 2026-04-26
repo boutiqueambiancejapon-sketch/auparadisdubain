@@ -1,0 +1,85 @@
+<section class="newsletter">
+  <div class="container">
+    <div class="newsletter__inner">
+      <div class="newsletter__bubbles" aria-hidden="true">
+        <span class="newsletter__bubble" style="top: 30px; left: 10%; width: 80px; height: 80px; background: var(--pink); animation: wobble 6s ease-in-out infinite;"></span>
+        <span class="newsletter__bubble" style="bottom: 20px; right: 8%; width: 60px; height: 60px; background: var(--mint); animation: wobble 8s ease-in-out infinite reverse;"></span>
+        <span class="newsletter__bubble" style="top: 60px; right: 30%; width: 40px; height: 40px; background: var(--vanilla); animation: wobble 5s ease-in-out infinite;"></span>
+      </div>
+
+      <div class="newsletter__copy">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="eyebrow" style="color: rgba(255,249,244,0.6); margin-bottom: 16px;">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="h-display newsletter__heading">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <p class="newsletter__text">{{ section.settings.text }}</p>
+        {%- endif -%}
+
+        {%- form 'customer', class: 'newsletter__form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <input type="email" name="contact[email]"
+                 placeholder="{{ 'general.newsletter.placeholder' | t }}"
+                 aria-label="{{ 'general.newsletter.label' | t }}"
+                 required>
+          <button type="submit" class="btn btn-sm" style="background: var(--pink-deep); color: var(--ink);">
+            {{ 'general.newsletter.submit' | t }}
+          </button>
+          {%- if form.posted_successfully? -%}
+            <p class="newsletter__success">{{ 'general.newsletter.success' | t }}</p>
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .newsletter { padding: 80px 0; }
+  .newsletter__inner {
+    background: var(--ink); color: var(--bg);
+    border-radius: var(--radius-xl); padding: 72px 48px;
+    position: relative; overflow: hidden; text-align: center;
+  }
+  .newsletter__bubbles { position: absolute; inset: 0; opacity: 0.15; pointer-events: none; }
+  .newsletter__bubble { position: absolute; border-radius: 50%; }
+  .newsletter__copy { position: relative; max-width: 540px; margin: 0 auto; }
+  .newsletter__heading { font-size: clamp(40px, 5vw, 56px); margin-bottom: 16px; line-height: 1; }
+  .newsletter__text { font-size: 15px; opacity: 0.75; margin-bottom: 32px; }
+
+  .newsletter__form {
+    display: flex; gap: 8px; padding: 6px;
+    background: rgba(255,249,244,0.1); border: 1px solid rgba(255,249,244,0.2);
+    border-radius: 999px; max-width: 420px; margin: 0 auto;
+  }
+  .newsletter__form input {
+    flex: 1; background: transparent; border: 0; padding: 0 18px;
+    color: var(--bg); font-size: 14px; outline: none; height: 44px;
+  }
+  .newsletter__form input::placeholder { color: rgba(255,249,244,0.5); }
+  .newsletter__success { margin-top: 12px; font-size: 12px; opacity: 0.85; }
+
+  @media (max-width: 600px) {
+    .newsletter { padding: 48px 0; }
+    .newsletter__inner { padding: 48px 24px; border-radius: var(--radius-lg); }
+    .newsletter__form { flex-direction: column; border-radius: var(--radius-md); }
+    .newsletter__form input { height: 44px; padding: 0 16px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "· Le Journal" },
+    { "type": "richtext", "id": "heading", "label": "Titre",
+      "default": "<p>-15% sur votre<br/>1ʳᵉ commande.</p>" },
+    { "type": "textarea", "id": "text", "label": "Texte",
+      "default": "Une lettre par mois : nouveautés, conseils rituels, accès aux ventes privées. Pas de spam, promis." }
+  ],
+  "presets": [ { "name": "Newsletter" } ]
+}
+{% endschema %}

@@ -1,0 +1,98 @@
+<section class="testimonials">
+  <div class="container">
+    <div class="testimonials__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="eyebrow" style="margin-bottom: 12px;">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="h-serif testimonials__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="grid cols-3 testimonials__grid">
+      {%- for block in section.blocks -%}
+        <div class="testimonial{% if forloop.index == 2 %} is-feature{% endif %}" {{ block.shopify_attributes }}>
+          {%- render 'stars', rating: block.settings.rating -%}
+          <p class="testimonial__text">« {{ block.settings.text }} »</p>
+          <div class="testimonial__meta">
+            <div><strong>{{ block.settings.name }}</strong>{% if block.settings.city != blank %} · {{ block.settings.city }}{% endif %}</div>
+            {%- if block.settings.product != blank -%}
+              <div class="testimonial__product">{{ block.settings.product }}</div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonials { padding: 100px 0; }
+  .testimonials__head { text-align: center; margin-bottom: 48px; }
+  .testimonials__heading { font-size: clamp(40px, 5vw, 56px); }
+
+  .testimonial {
+    padding: 32px; border-radius: var(--radius-lg);
+    background: #fff; border: 1px solid var(--line);
+  }
+  .testimonial.is-feature { background: var(--pink); border: 0; }
+  .testimonial__text {
+    margin-top: 16px; font-size: 17px; line-height: 1.55;
+    font-family: var(--font-display);
+  }
+  .testimonial__meta {
+    margin-top: 24px; padding-top: 20px;
+    border-top: 1px solid rgba(42,31,45,0.12);
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 13px; flex-wrap: wrap;
+  }
+  .testimonial__product { color: var(--ink-soft); }
+
+  @media (max-width: 900px) {
+    .testimonials { padding: 60px 0; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Témoignages",
+  "tag": "section",
+  "max_blocks": 9,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "· 8 412 avis · 4,9 / 5" },
+    { "type": "text", "id": "heading", "label": "Titre",   "default": "Pourquoi on nous aime." }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Avis",
+      "settings": [
+        { "type": "text",     "id": "name",    "label": "Prénom" },
+        { "type": "text",     "id": "city",    "label": "Ville" },
+        { "type": "text",     "id": "product", "label": "Produit cité" },
+        { "type": "textarea", "id": "text",    "label": "Témoignage" },
+        { "type": "range",    "id": "rating",  "label": "Étoiles", "min": 1, "max": 5, "step": 1, "default": 5 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Témoignages",
+      "blocks": [
+        { "type": "review", "settings": {
+          "name": "Camille L.", "city": "Paris 11ᵉ", "product": "Nuage Rose", "rating": 5,
+          "text": "Le Nuage Rose a transformé mon dimanche soir en rituel sacré. Mon mari a fini par m'en commander aussi."
+        } },
+        { "type": "review", "settings": {
+          "name": "Sophie M.", "city": "Lyon", "product": "Lait de Lune", "rating": 5,
+          "text": "Enfin une marque qui ne ment pas sur la composition. Je lis tous les ingrédients et tout est nickel."
+        } },
+        { "type": "review", "settings": {
+          "name": "Anaïs D.", "city": "Bordeaux", "product": "Macaron Pistache", "rating": 5,
+          "text": "L'odeur de la bombe Macaron Pistache… c'est dangereux d'avoir envie de la croquer."
+        } }
+      ]
+    }
+  ]
+}
+{% endschema %}

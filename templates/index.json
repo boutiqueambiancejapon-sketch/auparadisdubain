@@ -1,9 +1,146 @@
 {
   "sections": {
-    "placeholder": {
-      "type": "placeholder-home",
-      "settings": {}
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "✿ Nouvelle collection · Printemps 26",
+        "heading": "<p>Le bain,<br/><span class=\"wavy\">art doux</span><br/>de se retrouver.</p>",
+        "text": "<p>Bombes effervescentes, sels infusés, savons saponifiés à froid — façonnés à la main dans nos ateliers de Grasse avec des ingrédients bio, vegan et d'origine contrôlée.</p>",
+        "cta_primary_label": "Explorer les collections →",
+        "cta_secondary_label": "Trouver mon rituel",
+        "show_rating": true,
+        "rating_value": "4,9",
+        "rating_count": "8 412 avis vérifiés",
+        "cert_label": "Cosmos Organic",
+        "cert_sub": "Certifié bio depuis 2019",
+        "main_swatch": "pink",
+        "ring_text": "✿ BIO · VEGAN · ORIGINE CONTRÔLÉE · ARTISANAL · MADE IN FRANCE · ✿ BIO · VEGAN · ORIGINE CONTRÔLÉE · ARTISANAL ·",
+        "chip1_label": "sel",
+        "chip1_swatch": "mint",
+        "chip2_label": "savon",
+        "chip2_swatch": "vanilla"
+      }
+    },
+    "benefits": {
+      "type": "benefits-bar",
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "icon": "🌿", "label": "Bio & vegan certifié",  "sub": "Cosmos Organic" } },
+        "b2": { "type": "benefit", "settings": { "icon": "🇫🇷", "label": "Fabriqué en France",   "sub": "Ateliers de Grasse" } },
+        "b3": { "type": "benefit", "settings": { "icon": "🌸", "label": "Origine contrôlée",     "sub": "Filière transparente" } },
+        "b4": { "type": "benefit", "settings": { "icon": "📦", "label": "Livraison offerte",     "sub": "Dès 60€ d'achat" } },
+        "b5": { "type": "benefit", "settings": { "icon": "♻️", "label": "Emballages compostables", "sub": "Zéro plastique" } }
+      },
+      "block_order": ["b1", "b2", "b3", "b4", "b5"]
+    },
+    "collections": {
+      "type": "featured-collections",
+      "settings": {
+        "eyebrow": "· 06 collections",
+        "heading": "Choisissez votre rituel.",
+        "link_label": "Voir tout le catalogue →"
+      },
+      "blocks": {
+        "c1": { "type": "collection", "settings": { "title_override": "Bombes de bain",   "tagline": "Bouillonnement effervescent",     "swatch": "pink" } },
+        "c2": { "type": "collection", "settings": { "title_override": "Sels & infusions", "tagline": "Minéraux purs de l'Himalaya",    "swatch": "lilac" } },
+        "c3": { "type": "collection", "settings": { "title_override": "Savons artisanaux","tagline": "Saponifiés à froid en Provence", "swatch": "vanilla" } },
+        "c4": { "type": "collection", "settings": { "title_override": "Crèmes & laits",   "tagline": "Caresses végétales",              "swatch": "mint" } },
+        "c5": { "type": "collection", "settings": { "title_override": "Huiles précieuses","tagline": "Or liquide à fleur de peau",      "swatch": "pink" } },
+        "c6": { "type": "collection", "settings": { "title_override": "Coffrets cadeaux", "tagline": "L'art d'offrir le bain",          "swatch": "lilac" } }
+      },
+      "block_order": ["c1", "c2", "c3", "c4", "c5", "c6"]
+    },
+    "bestsellers": {
+      "type": "bestsellers",
+      "settings": {
+        "eyebrow": "· Best-sellers",
+        "heading": "Les favoris de la maison.",
+        "product_count": 4
+      }
+    },
+    "bundles": {
+      "type": "bundles",
+      "settings": {
+        "eyebrow": "· Coffrets cadeaux",
+        "heading": "L'art d'offrir le bain, emballé à la main."
+      },
+      "blocks": {
+        "g1": { "type": "bundle", "settings": {
+          "title_override": "Le Rituel du Dimanche", "tag": "Coffret signature",
+          "story": "Trois temps pour s'offrir une parenthèse : effervescence, infusion, hydratation.",
+          "includes_text": "Nuage Rose, Sel d'Hokkaido, Lait de Lune",
+          "price_text": "78€", "was_text": "94€", "swatch": "pink"
+        } },
+        "g2": { "type": "bundle", "settings": {
+          "title_override": "Escapade Provence", "tag": "Made in France",
+          "story": "Un voyage olfactif entre les champs de lavande et les marchés provençaux.",
+          "includes_text": "Bain de Lavande, Vanille Givrée, Pétales d'Aube",
+          "price_text": "92€", "was_text": "112€", "swatch": "lilac"
+        } },
+        "g3": { "type": "bundle", "settings": {
+          "title_override": "Découverte Mini", "tag": "Idée cadeau",
+          "story": "Six fragrances en miniature, parfaites pour explorer notre univers.",
+          "includes_text": "6 bombes mini, Pochon en lin",
+          "price_text": "42€", "was_text": "54€", "swatch": "mint"
+        } }
+      },
+      "block_order": ["g1", "g2", "g3"]
+    },
+    "quiz": {
+      "type": "quiz",
+      "settings": {
+        "eyebrow": "· Quiz · 60 secondes",
+        "heading": "Trouvez votre rituel idéal.",
+        "text": "Trois questions, une recommandation sur-mesure parmi nos 118 références. Curieux de savoir ce que votre humeur révèle ?",
+        "result_title": "Le Rituel du Dimanche",
+        "result_text": "Cocooning, floral, durée moyenne : notre coffret signature est fait pour vous.",
+        "result_cta": "Découvrir mon rituel →"
+      },
+      "blocks": {
+        "q1": { "type": "question", "settings": { "question": "Votre humeur du soir ?",          "options": "Cocooning\nÉnergique\nRomantique\nMéditatif" } },
+        "q2": { "type": "question", "settings": { "question": "Une fragrance qui vous transporte ?", "options": "Florale\nGourmande\nBoisée\nAquatique" } },
+        "q3": { "type": "question", "settings": { "question": "Votre temps idéal de bain ?",     "options": "20 min express\n45 min rituel\n1h+ marathon\nVariable" } }
+      },
+      "block_order": ["q1", "q2", "q3"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "· 8 412 avis · 4,9 / 5",
+        "heading": "Pourquoi on nous aime."
+      },
+      "blocks": {
+        "t1": { "type": "review", "settings": {
+          "name": "Camille L.", "city": "Paris 11ᵉ", "product": "Nuage Rose", "rating": 5,
+          "text": "Le Nuage Rose a transformé mon dimanche soir en rituel sacré. Mon mari a fini par m'en commander aussi."
+        } },
+        "t2": { "type": "review", "settings": {
+          "name": "Sophie M.", "city": "Lyon", "product": "Lait de Lune", "rating": 5,
+          "text": "Enfin une marque qui ne ment pas sur la composition. Je lis tous les ingrédients et tout est nickel."
+        } },
+        "t3": { "type": "review", "settings": {
+          "name": "Anaïs D.", "city": "Bordeaux", "product": "Macaron Pistache", "rating": 5,
+          "text": "L'odeur de la bombe Macaron Pistache… c'est dangereux d'avoir envie de la croquer."
+        } }
+      },
+      "block_order": ["t1", "t2", "t3"]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "eyebrow": "· Le Journal",
+        "heading": "<p>-15% sur votre<br/>1ʳᵉ commande.</p>",
+        "text": "Une lettre par mois : nouveautés, conseils rituels, accès aux ventes privées. Pas de spam, promis."
+      }
     }
   },
-  "order": ["placeholder"]
+  "order": [
+    "hero",
+    "benefits",
+    "collections",
+    "bestsellers",
+    "bundles",
+    "quiz",
+    "testimonials",
+    "newsletter"
+  ]
 }
