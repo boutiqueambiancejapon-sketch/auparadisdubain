@@ -1,0 +1,107 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Au Paradis du Bain",
+    "theme_version": "0.1.0",
+    "theme_author": "Au Paradis du Bain",
+    "theme_documentation_url": "https://www.shopify.com",
+    "theme_support_url": "https://www.shopify.com"
+  },
+  {
+    "name": "Palette",
+    "settings": [
+      {
+        "type": "select",
+        "id": "palette",
+        "label": "Palette de couleurs",
+        "options": [
+          { "value": "pastel", "label": "Rose poudré (défaut)" },
+          { "value": "cool",   "label": "Mint & lavande" },
+          { "value": "candy",  "label": "Bonbon" }
+        ],
+        "default": "pastel"
+      }
+    ]
+  },
+  {
+    "name": "Animations",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "bubbles_enabled",
+        "label": "Bulles d'arrière-plan",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "bubbles_density",
+        "label": "Densité des bulles",
+        "min": 4,
+        "max": 40,
+        "step": 2,
+        "default": 18
+      },
+      {
+        "type": "checkbox",
+        "id": "bubbles_trail",
+        "label": "Traînée de bulles au curseur",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Identité",
+    "settings": [
+      {
+        "type": "text",
+        "id": "brand_name",
+        "label": "Nom de la marque",
+        "default": "Au Paradis du Bain"
+      },
+      {
+        "type": "text",
+        "id": "brand_tagline",
+        "label": "Tagline (sous le logo)",
+        "default": "DU BAIN"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo (laisser vide pour le SVG par défaut)"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "label": "Largeur du logo (px)",
+        "min": 80,
+        "max": 200,
+        "step": 5,
+        "default": 120
+      }
+    ]
+  },
+  {
+    "name": "Mise en page",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Largeur du contenu",
+        "min": 1100,
+        "max": 1500,
+        "step": 20,
+        "unit": "px",
+        "default": 1320
+      }
+    ]
+  },
+  {
+    "name": "Réseaux sociaux",
+    "settings": [
+      { "type": "url", "id": "social_instagram", "label": "Instagram" },
+      { "type": "url", "id": "social_facebook",  "label": "Facebook" },
+      { "type": "url", "id": "social_pinterest", "label": "Pinterest" },
+      { "type": "url", "id": "social_tiktok",    "label": "TikTok" }
+    ]
+  }
+]
