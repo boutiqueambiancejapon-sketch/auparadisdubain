@@ -2,8 +2,20 @@
   "sections": {
     "main": {
       "type": "main-product",
-      "settings": {}
+      "settings": {
+        "show_trust_badges": true
+      }
+    },
+    "tabs": {
+      "type": "product-tabs",
+      "blocks": {
+        "description":  { "type": "description" },
+        "ingredients":  { "type": "ingredients" },
+        "ritual":       { "type": "ritual" },
+        "reviews":      { "type": "reviews" }
+      },
+      "block_order": ["description", "ingredients", "ritual", "reviews"]
     }
   },
-  "order": ["main"]
+  "order": ["main", "tabs"]
 }
