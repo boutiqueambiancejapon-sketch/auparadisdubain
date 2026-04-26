@@ -1,0 +1,145 @@
+{%- liquid
+  assign palette = 'pink,vanilla,mint,lilac' | split: ','
+  assign sw_index = article.id | modulo: 4
+  assign swatch = article.metafields.custom.swatch | default: palette[sw_index]
+-%}
+
+<article class="article-page">
+  <header class="article-page__hero article-page__hero--{{ swatch }}">
+    <div class="container article-page__hero-inner">
+      <div style="margin-bottom: 24px;">{%- render 'breadcrumbs' -%}</div>
+
+      <div class="eyebrow" style="margin-bottom: 16px;">
+        · <a href="{{ blog.url }}">{{ blog.title }}</a>
+        {%- if article.tags.size > 0 %} · {{ article.tags.first }}{% endif -%}
+      </div>
+
+      <h1 class="h-display article-page__title">{{ article.title }}</h1>
+
+      <div class="article-page__meta">
+        <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+          {{- article.published_at | date: '%d %B %Y' -}}
+        </time>
+        {%- if article.author != blank %} · {{ 'blogs.article.by_author' | t: author: article.author }}{% endif -%}
+      </div>
+    </div>
+  </header>
+
+  {%- if article.image != blank -%}
+    <div class="container">
+      <div class="article-page__image">
+        {{ article.image | image_url: width: 1600 | image_tag:
+            alt: article.image.alt | default: article.title,
+            loading: 'eager',
+            widths: '600, 900, 1200, 1600',
+            sizes: '(max-width: 1320px) 100vw, 1320px' }}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="container">
+    <div class="article-page__body">
+      {{ article.content }}
+    </div>
+
+    {%- if article.tags.size > 0 -%}
+      <div class="article-page__tags">
+        {%- for tag in article.tags -%}
+          <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="tag tag-{{ swatch }}">#{{ tag }}</a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if blog.comments_enabled? -%}
+      <section class="article-page__comments" id="comments">
+        <h2 class="h-serif" style="font-size: 32px; margin-bottom: 24px;">Commentaires</h2>
+
+        {%- if article.comments_count > 0 -%}
+          {%- paginate article.comments by 10 -%}
+            <ul class="article-page__comment-list">
+              {%- for comment in article.comments -%}
+                <li class="article-page__comment">
+                  <div class="article-page__comment-head">
+                    <strong>{{ comment.author }}</strong>
+                    <time datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">
+                      {{- comment.created_at | date: '%d %b %Y' -}}
+                    </time>
+                  </div>
+                  <div>{{ comment.content }}</div>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endpaginate -%}
+        {%- endif -%}
+
+        {%- form 'new_comment', article, class: 'article-page__comment-form' -%}
+          <div class="grid cols-2" style="gap: 16px;">
+            <input type="text" name="comment[author]" placeholder="Votre prénom" required>
+            <input type="email" name="comment[email]" placeholder="votre@email.com" required>
+          </div>
+          <textarea name="comment[body]" rows="5" placeholder="Votre commentaire" required></textarea>
+          {%- if blog.moderated? -%}
+            <p style="font-size: 12px; color: var(--ink-soft); margin: 8px 0;">Les commentaires sont modérés avant publication.</p>
+          {%- endif -%}
+          <button type="submit" class="btn">Publier mon commentaire</button>
+        {%- endform -%}
+      </section>
+    {%- endif -%}
+  </div>
+</article>
+
+<style>
+  .article-page { padding-bottom: 80px; }
+  .article-page__hero { padding: 60px 0 80px; position: relative; overflow: hidden; }
+  .article-page__hero--pink    { background: var(--bg-soft); }
+  .article-page__hero--vanilla { background: #FFF3DC; }
+  .article-page__hero--mint    { background: #E2F7EE; }
+  .article-page__hero--lilac   { background: #EAE3FC; }
+  .article-page__hero-inner { max-width: 880px; }
+  .article-page__title { font-size: clamp(48px, 7vw, 88px); line-height: 0.95; margin-bottom: 24px; }
+  .article-page__meta { font-size: 14px; color: var(--ink-soft); }
+
+  .article-page__image {
+    margin: -40px auto 40px; max-width: 1200px;
+    border-radius: var(--radius-xl); overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    aspect-ratio: 16 / 9;
+  }
+  .article-page__image img { width: 100%; height: 100%; object-fit: cover; }
+
+  .article-page__body {
+    max-width: 720px; margin: 0 auto;
+    font-size: 17px; line-height: 1.8; color: var(--ink-soft);
+  }
+  .article-page__body h2 { font-family: var(--font-display); font-size: 36px; color: var(--ink); margin: 40px 0 16px; line-height: 1.1; }
+  .article-page__body h3 { font-family: var(--font-display); font-size: 24px; color: var(--ink); margin: 32px 0 12px; }
+  .article-page__body p + p { margin-top: 20px; }
+  .article-page__body p { color: var(--ink-soft); }
+  .article-page__body strong { color: var(--ink); }
+  .article-page__body a { color: var(--ink); border-bottom: 1px solid var(--pink-deep); }
+  .article-page__body img { border-radius: var(--radius-md); margin: 32px 0; }
+  .article-page__body blockquote {
+    margin: 32px -16px; padding: 28px 32px;
+    background: var(--bg-soft); border-radius: var(--radius-lg);
+    font-family: var(--font-display); font-size: 22px; color: var(--ink); line-height: 1.4;
+  }
+  .article-page__body ul, .article-page__body ol { padding-left: 20px; margin: 16px 0; display: flex; flex-direction: column; gap: 8px; }
+  .article-page__body ol { list-style: decimal; }
+  .article-page__body ul { list-style: disc; }
+
+  .article-page__tags { display: flex; gap: 8px; flex-wrap: wrap; max-width: 720px; margin: 48px auto 0; }
+  .article-page__comments { max-width: 720px; margin: 80px auto 0; padding-top: 48px; border-top: 1px solid var(--line); }
+  .article-page__comment-list { list-style: none; display: flex; flex-direction: column; gap: 24px; margin-bottom: 48px; }
+  .article-page__comment { padding: 20px; background: var(--bg-soft); border-radius: var(--radius-md); }
+  .article-page__comment-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: var(--ink-soft); }
+  .article-page__comment-form { display: flex; flex-direction: column; gap: 12px; }
+  .article-page__comment-form textarea { width: 100%; }
+</style>
+
+{% schema %}
+{
+  "name": "Article",
+  "tag": "section",
+  "settings": []
+}
+{% endschema %}
