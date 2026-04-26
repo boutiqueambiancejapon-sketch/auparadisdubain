@@ -1,0 +1,85 @@
+<section class="list-collections">
+  <div class="container">
+    <div class="list-collections__head">
+      <div class="eyebrow" style="margin-bottom: 12px;">· {{ collections.size }} collections</div>
+      <h1 class="h-display list-collections__title">Toutes nos collections</h1>
+    </div>
+
+    <div class="list-collections__grid">
+      {%- for col in collections -%}
+        {%- if col.handle == 'all' or col.products_count == 0 -%}{%- continue -%}{%- endif -%}
+        {%- assign sw = col.metafields.custom.swatch | default: 'pink' -%}
+        {%- assign tagline = col.metafields.custom.tagline -%}
+        <a href="{{ col.url }}" class="list-collection-card list-collection-card--{{ sw }}">
+          <div class="list-collection-card__media">
+            {%- if col.featured_image != blank -%}
+              {{ col.featured_image | image_url: width: 600 | image_tag: alt: col.title, loading: 'lazy' }}
+            {%- endif -%}
+            <span class="list-collection-card__bubble" aria-hidden="true"></span>
+          </div>
+          <div class="list-collection-card__body">
+            <span class="eyebrow">· {{ col.products_count }} produits</span>
+            <h2 class="h-display list-collection-card__title">{{ col.title }}</h2>
+            {%- if tagline != blank -%}
+              <p class="list-collection-card__tagline">{{ tagline }}</p>
+            {%- endif -%}
+            <span class="list-collection-card__cta">Découvrir →</span>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .list-collections { padding: 60px 0 100px; }
+  .list-collections__head { margin-bottom: 48px; }
+  .list-collections__title { font-size: clamp(56px, 8vw, 112px); line-height: 0.95; }
+
+  .list-collections__grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  }
+
+  .list-collection-card {
+    border-radius: var(--radius-lg); overflow: hidden;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    display: flex; flex-direction: column;
+  }
+  .list-collection-card:hover { transform: translateY(-6px); }
+  .list-collection-card--pink    { background: #FFE9EE; }
+  .list-collection-card--vanilla { background: #FFF3DC; }
+  .list-collection-card--mint    { background: #E2F7EE; }
+  .list-collection-card--lilac   { background: #EAE3FC; }
+
+  .list-collection-card__media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+  .list-collection-card__media img { width: 100%; height: 100%; object-fit: cover; }
+  .list-collection-card__bubble {
+    position: absolute; top: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,0.4));
+    border: 1px solid rgba(255,255,255,0.7);
+    animation: wobble 6s ease-in-out infinite;
+  }
+
+  .list-collection-card__body { padding: 28px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .list-collection-card__title { font-size: 32px; line-height: 0.95; margin: 4px 0; }
+  .list-collection-card__tagline { color: var(--ink-soft); font-size: 14px; line-height: 1.5; }
+  .list-collection-card__cta { margin-top: auto; font-size: 13px; font-weight: 500; padding-top: 16px; }
+
+  @media (max-width: 900px) {
+    .list-collections { padding: 32px 0 60px; }
+    .list-collections__grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .list-collection-card__title { font-size: 24px; }
+    .list-collection-card__body { padding: 20px; }
+  }
+  @media (max-width: 560px) {
+    .list-collections__grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Toutes les collections",
+  "tag": "section",
+  "settings": []
+}
+{% endschema %}
