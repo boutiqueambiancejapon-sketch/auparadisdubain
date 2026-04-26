@@ -1,0 +1,146 @@
+{%- liquid
+  assign swatch = collection.metafields.custom.swatch | default: 'pink'
+  assign tagline = collection.metafields.custom.tagline
+  assign products_per_page = section.settings.products_per_page | default: 12
+-%}
+
+<section class="collection-header collection-header--{{ swatch }}">
+  <div class="collection-header__blob" aria-hidden="true"></div>
+
+  <div class="container collection-header__inner">
+    {%- render 'breadcrumbs' -%}
+
+    <div class="collection-header__grid">
+      <div>
+        <div class="eyebrow" style="margin-bottom: 12px;">
+          · {{ collection.products_count }} {% if collection.products_count == 1 %}produit{% else %}produits{% endif %}
+        </div>
+        <h1 class="h-display collection-header__title">{{ collection.title }}</h1>
+      </div>
+      {%- if collection.description != blank or tagline != blank -%}
+        <div class="collection-header__copy">
+          {%- if tagline != blank -%}
+            <p style="font-family: var(--font-display); font-size: 22px; color: var(--ink); margin-bottom: 12px;">
+              {{ tagline }}
+            </p>
+          {%- endif -%}
+          {%- if collection.description != blank -%}
+            <div class="collection-header__desc">{{ collection.description }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{%- comment -%} Filter bar slot — populated in Stage 4b {%- endcomment -%}
+<div data-collection-filterbar></div>
+
+<section class="collection-grid">
+  <div class="container">
+    {%- paginate collection.products by products_per_page -%}
+      {%- if collection.products.size > 0 -%}
+        <div class="grid cols-4 collection-grid__items">
+          {%- for product in collection.products -%}
+            {%- render 'product-card', product: product -%}
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="collection-pagination" aria-label="Pagination">
+            {%- if paginate.previous -%}
+              <a href="{{ paginate.previous.url }}" class="btn btn-sm btn-secondary">← Précédent</a>
+            {%- endif -%}
+            <ol class="collection-pagination__pages">
+              {%- for part in paginate.parts -%}
+                {%- if part.is_link -%}
+                  <li><a href="{{ part.url }}">{{ part.title }}</a></li>
+                {%- elsif part.title == paginate.current_page -%}
+                  <li aria-current="page">{{ part.title }}</li>
+                {%- else -%}
+                  <li>{{ part.title }}</li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ol>
+            {%- if paginate.next -%}
+              <a href="{{ paginate.next.url }}" class="btn btn-sm btn-secondary">Suivant →</a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+      {%- else -%}
+        <div class="collection-empty">
+          <p class="h-serif" style="font-size: 28px; margin-bottom: 12px;">Cette collection est vide.</p>
+          <p style="color: var(--ink-soft); margin-bottom: 24px;">Aucun produit ne correspond à votre sélection.</p>
+          <a href="{{ collection.url }}" class="btn btn-secondary">Réinitialiser les filtres</a>
+        </div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+<style>
+  .collection-header {
+    padding: 60px 0 40px;
+    background: var(--bg-soft);
+    position: relative; overflow: hidden;
+  }
+  .collection-header__blob {
+    position: absolute; top: -80px; right: 10%; width: 280px; height: 280px;
+    border-radius: 50%; opacity: 0.6; pointer-events: none;
+  }
+  .collection-header--pink    .collection-header__blob { background: radial-gradient(circle at 30% 30%, var(--pink), transparent 70%); }
+  .collection-header--vanilla .collection-header__blob { background: radial-gradient(circle at 30% 30%, var(--vanilla), transparent 70%); }
+  .collection-header--mint    .collection-header__blob { background: radial-gradient(circle at 30% 30%, var(--mint), transparent 70%); }
+  .collection-header--lilac   .collection-header__blob { background: radial-gradient(circle at 30% 30%, var(--lilac), transparent 70%); }
+
+  .collection-header__inner { position: relative; }
+  .collection-header__grid {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px;
+    align-items: end; margin-top: 24px;
+  }
+  .collection-header__title { font-size: clamp(60px, 8vw, 112px); line-height: 0.95; }
+  .collection-header__copy { padding-bottom: 16px; }
+  .collection-header__desc {
+    font-size: 17px; color: var(--ink-soft); line-height: 1.55;
+  }
+  .collection-header__desc p + p { margin-top: 12px; }
+
+  .collection-grid { padding: 48px 0 80px; }
+  .collection-grid__items { margin-bottom: 48px; }
+
+  .collection-pagination {
+    display: flex; justify-content: center; align-items: center; gap: 12px;
+    margin-top: 24px; flex-wrap: wrap;
+  }
+  .collection-pagination__pages {
+    list-style: none; display: flex; gap: 4px; align-items: center;
+    font-size: 14px;
+  }
+  .collection-pagination__pages li {
+    min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 999px; padding: 0 10px;
+  }
+  .collection-pagination__pages li[aria-current="page"] { background: var(--ink); color: var(--bg); font-weight: 600; }
+  .collection-pagination__pages a:hover { background: var(--bg-soft); }
+
+  .collection-empty { text-align: center; padding: 80px 0; }
+
+  @media (max-width: 900px) {
+    .collection-header { padding: 32px 0 24px; }
+    .collection-header__grid { grid-template-columns: 1fr; gap: 16px; }
+    .collection-grid { padding: 32px 0 48px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Page collection",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range", "id": "products_per_page", "label": "Produits par page",
+      "min": 8, "max": 48, "step": 4, "default": 12
+    }
+  ]
+}
+{% endschema %}
