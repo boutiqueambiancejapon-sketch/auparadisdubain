@@ -15,7 +15,15 @@
         "reviews":      { "type": "reviews" }
       },
       "block_order": ["description", "ingredients", "ritual", "reviews"]
+    },
+    "cross-sell": {
+      "type": "cross-sell",
+      "settings": {
+        "heading": "Vous aimerez aussi",
+        "mode": "related",
+        "limit": 4
+      }
     }
   },
-  "order": ["main", "tabs"]
+  "order": ["main", "tabs", "cross-sell"]
 }
