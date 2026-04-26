@@ -33,8 +33,83 @@
   </div>
 </section>
 
-{%- comment -%} Filter bar slot — populated in Stage 4b {%- endcomment -%}
-<div data-collection-filterbar></div>
+{%- if section.settings.show_filterbar -%}
+  <section class="collection-filterbar" data-collection-filterbar>
+    <div class="container collection-filterbar__inner">
+      <form id="collection-filter-form" class="collection-filterbar__form">
+        {%- comment -%}
+          Preserve the current sort across filter submissions and vice
+          versa: hidden inputs hold whichever param the visible widget
+          isn't currently editing.
+        {%- endcomment -%}
+
+        <div class="collection-filterbar__filters">
+          {%- for filter in collection.filters -%}
+            {%- case filter.type -%}
+
+              {%- when 'boolean' -%}
+                {%- assign active_value = filter.true_value -%}
+                {%- assign is_on = false -%}
+                {%- if filter.active_values.size > 0 -%}{%- assign is_on = true -%}{%- endif -%}
+                <label class="filter-pill {% if is_on %}is-on{% endif %}">
+                  <input type="checkbox"
+                         name="{{ filter.true_value.param_name }}"
+                         value="{{ filter.true_value.value }}"
+                         {% if is_on %}checked{% endif %}
+                         hidden>
+                  {% if is_on %}✓ {% else %}+ {% endif %}{{ filter.label }}
+                </label>
+
+              {%- when 'list' -%}
+                {%- for value in filter.values -%}
+                  <label class="filter-pill {% if value.active %}is-on{% endif %}">
+                    <input type="checkbox"
+                           name="{{ value.param_name }}"
+                           value="{{ value.value }}"
+                           {% if value.active %}checked{% endif %}
+                           hidden>
+                    {% if value.active %}✓ {% else %}+ {% endif %}{{ value.label }}
+                  </label>
+                {%- endfor -%}
+
+              {%- when 'price_range' -%}
+                {%- assign min = filter.min_value.value | default: 0 | divided_by: 100.0 | round -%}
+                {%- assign max = filter.max_value.value | default: filter.range_max | divided_by: 100.0 | round -%}
+                {%- assign range_max = filter.range_max | divided_by: 100.0 | round -%}
+                <div class="filter-price">
+                  <span class="filter-price__label">Prix &le;</span>
+                  <input type="range"
+                         name="{{ filter.max_value.param_name }}"
+                         min="0"
+                         max="{{ range_max }}"
+                         value="{{ max }}"
+                         data-price-slider>
+                  <output data-price-output>{{ max }}€</output>
+                </div>
+
+            {%- endcase -%}
+          {%- endfor -%}
+        </div>
+
+        <div class="collection-filterbar__sort">
+          <label for="SortBy" class="collection-filterbar__sort-label">Trier&nbsp;:</label>
+          <select id="SortBy" name="sort_by">
+            {%- for option in collection.sort_options -%}
+              <option value="{{ option.value }}"
+                      {% if option.value == collection.sort_by or option.value == collection.default_sort_by %}selected{% endif %}>
+                {{ option.name }}
+              </option>
+            {%- endfor -%}
+          </select>
+        </div>
+
+        <noscript>
+          <button type="submit" class="btn btn-sm">Appliquer</button>
+        </noscript>
+      </form>
+    </div>
+  </section>
+{%- endif -%}
 
 <section class="collection-grid">
   <div class="container">
@@ -125,12 +200,75 @@
 
   .collection-empty { text-align: center; padding: 80px 0; }
 
+  /* Filter bar */
+  .collection-filterbar {
+    padding: 32px 0;
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 76px; z-index: 30;
+    background: rgba(255, 249, 244, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  [data-palette="cool"] .collection-filterbar { background: rgba(246, 251, 250, 0.92); }
+  [data-palette="candy"] .collection-filterbar { background: rgba(255, 246, 248, 0.92); }
+
+  .collection-filterbar__form {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .collection-filterbar__filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .filter-pill {
+    display: inline-flex; align-items: center;
+    padding: 8px 16px; border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    border: 1.5px solid var(--line-strong);
+    background: transparent; color: var(--ink);
+    cursor: pointer; transition: all .2s;
+    user-select: none;
+  }
+  .filter-pill:hover { border-color: var(--ink); }
+  .filter-pill.is-on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .filter-price { display: inline-flex; align-items: center; gap: 10px; padding: 0 16px; }
+  .filter-price__label { font-size: 13px; color: var(--ink-soft); }
+  .filter-price input[type="range"] { width: 120px; accent-color: var(--pink-deep); height: 4px; }
+  .filter-price output { font-size: 13px; font-weight: 600; min-width: 48px; }
+
+  .collection-filterbar__sort { display: flex; align-items: center; gap: 12px; }
+  .collection-filterbar__sort-label { font-size: 13px; color: var(--ink-soft); }
+  .collection-filterbar__sort select {
+    padding: 0 14px; height: 38px; border-radius: 999px;
+    border: 1.5px solid var(--line-strong);
+    font-size: 13px; font-weight: 500;
+    background: transparent;
+  }
+
   @media (max-width: 900px) {
     .collection-header { padding: 32px 0 24px; }
     .collection-header__grid { grid-template-columns: 1fr; gap: 16px; }
     .collection-grid { padding: 32px 0 48px; }
+    .collection-filterbar { top: 64px; padding: 16px 0; }
+    .collection-filterbar__form { gap: 12px; }
   }
 </style>
+
+<script>
+  (function () {
+    const form = document.getElementById('collection-filter-form');
+    if (!form) return;
+
+    /* Auto-submit on any change (filter toggle, sort, price slider release) */
+    form.addEventListener('change', () => form.submit());
+
+    /* Live update the price slider's output value as the user drags */
+    const slider = form.querySelector('[data-price-slider]');
+    const output = form.querySelector('[data-price-output]');
+    if (slider && output) {
+      slider.addEventListener('input', () => { output.textContent = slider.value + '€'; });
+    }
+  })();
+</script>
 
 {% schema %}
 {
@@ -140,6 +278,10 @@
     {
       "type": "range", "id": "products_per_page", "label": "Produits par page",
       "min": 8, "max": 48, "step": 4, "default": 12
+    },
+    {
+      "type": "checkbox", "id": "show_filterbar", "label": "Afficher la barre de filtres", "default": true,
+      "info": "Configurez les filtres dans Boutique en ligne › Navigation › Filtres."
     }
   ]
 }
