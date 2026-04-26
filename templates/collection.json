@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-collection",
+      "settings": {
+        "products_per_page": 12,
+        "show_filterbar": true
+      }
+    },
+    "related": {
+      "type": "related-collections",
+      "settings": {
+        "heading": "Autres collections",
+        "mode": "auto",
+        "limit": 5
+      }
+    }
+  },
+  "order": ["main", "related"]
+}

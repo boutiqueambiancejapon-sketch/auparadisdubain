@@ -1,0 +1,43 @@
+<section class="page-404">
+  <div class="page-404__bubble page-404__bubble--a" aria-hidden="true"></div>
+  <div class="page-404__bubble page-404__bubble--b" aria-hidden="true"></div>
+
+  <div class="container page-404__inner">
+    <div class="eyebrow" style="margin-bottom: 16px;">· Erreur 404</div>
+    <h1 class="h-display page-404__title">{{ '404.title' | t }}</h1>
+    <p class="page-404__sub">{{ '404.subtext' | t }}</p>
+    <a href="{{ routes.root_url }}" class="btn">{{ '404.back_home' | t }} →</a>
+  </div>
+</section>
+
+<style>
+  .page-404 {
+    position: relative; overflow: hidden;
+    text-align: center; padding: 120px 0;
+  }
+  .page-404__inner { position: relative; z-index: 2; max-width: 540px; }
+  .page-404__title { font-size: clamp(80px, 14vw, 200px); line-height: 0.85; }
+  .page-404__sub {
+    font-family: var(--font-display); font-size: 22px; color: var(--ink-soft);
+    margin: 24px 0 32px;
+  }
+  .page-404__bubble { position: absolute; border-radius: 50%; pointer-events: none; }
+  .page-404__bubble--a {
+    top: 10%; left: 10%; width: 220px; height: 220px;
+    background: radial-gradient(circle at 30% 30%, var(--pink), transparent 70%);
+    opacity: 0.6; animation: wobble 6s ease-in-out infinite;
+  }
+  .page-404__bubble--b {
+    bottom: 10%; right: 10%; width: 180px; height: 180px;
+    background: radial-gradient(circle at 30% 30%, var(--mint), transparent 70%);
+    opacity: 0.5; animation: wobble 8s ease-in-out infinite reverse;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Page 404",
+  "tag": "section",
+  "settings": []
+}
+{% endschema %}

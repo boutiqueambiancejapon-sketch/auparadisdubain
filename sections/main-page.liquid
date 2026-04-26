@@ -1,0 +1,52 @@
+<section class="page-content">
+  <div class="container">
+    {%- if section.settings.show_breadcrumbs -%}
+      <div style="margin-bottom: 24px;">{%- render 'breadcrumbs' -%}</div>
+    {%- endif -%}
+
+    <div class="page-content__head">
+      <h1 class="h-display page-content__title">{{ page.title }}</h1>
+      {%- if page.metafields.custom.tagline != blank -%}
+        <p class="page-content__tagline">{{ page.metafields.custom.tagline }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="page-content__rte">
+      {{ page.content }}
+    </div>
+  </div>
+</section>
+
+<style>
+  .page-content { padding: 60px 0 100px; }
+  .page-content__head { margin-bottom: 40px; }
+  .page-content__title { font-size: clamp(48px, 7vw, 96px); line-height: 0.95; }
+  .page-content__tagline { margin-top: 16px; font-family: var(--font-display); font-size: 22px; color: var(--ink-soft); max-width: 640px; }
+
+  .page-content__rte {
+    max-width: 720px; font-size: 17px; line-height: 1.65; color: var(--ink-soft);
+  }
+  .page-content__rte h2 { font-family: var(--font-display); font-size: 32px; color: var(--ink); margin: 32px 0 16px; }
+  .page-content__rte h3 { font-family: var(--font-display); font-size: 22px; color: var(--ink); margin: 24px 0 12px; }
+  .page-content__rte p + p { margin-top: 16px; }
+  .page-content__rte ul, .page-content__rte ol { padding-left: 20px; margin: 16px 0; display: flex; flex-direction: column; gap: 8px; }
+  .page-content__rte ol { list-style: decimal; }
+  .page-content__rte ul { list-style: disc; }
+  .page-content__rte a { color: var(--ink); border-bottom: 1px solid var(--pink-deep); }
+  .page-content__rte img { border-radius: var(--radius-md); margin: 24px 0; }
+  .page-content__rte blockquote {
+    margin: 32px 0; padding: 24px 28px;
+    background: var(--bg-soft); border-radius: var(--radius-lg);
+    font-family: var(--font-display); font-size: 20px; color: var(--ink);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Page",
+  "tag": "section",
+  "settings": [
+    { "type": "checkbox", "id": "show_breadcrumbs", "label": "Afficher le fil d'Ariane", "default": true }
+  ]
+}
+{% endschema %}

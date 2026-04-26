@@ -1,0 +1,44 @@
+{%- comment -%}
+  Renders contextual breadcrumbs based on the current request.
+{%- endcomment -%}
+<nav class="breadcrumbs" aria-label="Fil d'Ariane">
+  <a href="{{ routes.root_url }}">Accueil</a>
+  <span class="breadcrumbs__sep">/</span>
+
+  {%- case request.page_type -%}
+    {%- when 'collection' -%}
+      <a href="{{ routes.collections_url }}">Collections</a>
+      <span class="breadcrumbs__sep">/</span>
+      <span aria-current="page">{{ collection.title }}</span>
+
+    {%- when 'product' -%}
+      {%- if collection -%}
+        <a href="{{ collection.url }}">{{ collection.title }}</a>
+      {%- elsif product.collections.first -%}
+        <a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>
+      {%- else -%}
+        <a href="{{ routes.collections_url }}">Boutique</a>
+      {%- endif -%}
+      <span class="breadcrumbs__sep">/</span>
+      <span aria-current="page">{{ product.title }}</span>
+
+    {%- when 'page' -%}
+      <span aria-current="page">{{ page.title }}</span>
+
+    {%- when 'article' -%}
+      <a href="{{ blog.url }}">{{ blog.title }}</a>
+      <span class="breadcrumbs__sep">/</span>
+      <span aria-current="page">{{ article.title }}</span>
+
+    {%- else -%}
+      <span aria-current="page">{{ page_title }}</span>
+  {%- endcase -%}
+</nav>
+
+<style>
+  .breadcrumbs { font-size: 13px; color: var(--ink-soft); }
+  .breadcrumbs a { border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+  .breadcrumbs a:hover { color: var(--ink); }
+  .breadcrumbs__sep { margin: 0 8px; }
+  .breadcrumbs [aria-current="page"] { color: var(--ink); }
+</style>

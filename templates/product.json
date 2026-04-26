@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "show_trust_badges": true
+      }
+    },
+    "tabs": {
+      "type": "product-tabs",
+      "blocks": {
+        "description":  { "type": "description" },
+        "ingredients":  { "type": "ingredients" },
+        "ritual":       { "type": "ritual" },
+        "reviews":      { "type": "reviews" }
+      },
+      "block_order": ["description", "ingredients", "ritual", "reviews"]
+    },
+    "cross-sell": {
+      "type": "cross-sell",
+      "settings": {
+        "heading": "Vous aimerez aussi",
+        "mode": "related",
+        "limit": 4
+      }
+    }
+  },
+  "order": ["main", "tabs", "cross-sell"]
+}

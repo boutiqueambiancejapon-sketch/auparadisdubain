@@ -1,0 +1,133 @@
+{%- liquid
+  assign limit = section.settings.limit | default: 4
+  assign mode = section.settings.mode | default: 'related'
+
+  case mode
+    when 'related'
+      assign products_to_show = recommendations.products
+    when 'collection'
+      assign source = collections[section.settings.collection]
+      assign products_to_show = source.products
+    when 'manual'
+      assign products_to_show = section.blocks
+  endcase
+-%}
+
+<section class="cross-sell">
+  <div class="container">
+    {%- if section.settings.heading != blank -%}
+      <h3 class="h-serif cross-sell__heading">{{ section.settings.heading }}</h3>
+    {%- endif -%}
+
+    {%- if mode == 'manual' -%}
+      <div class="grid cols-4 cross-sell__grid">
+        {%- for block in section.blocks limit: limit -%}
+          {%- assign p = all_products[block.settings.product] -%}
+          {%- if p != blank -%}
+            {%- render 'product-card', product: p -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+    {%- elsif mode == 'related' -%}
+      {%- comment -%}
+        Shopify's recommendations API streams products via a hidden
+        endpoint. Render a placeholder grid that gets hydrated on load.
+      {%- endcomment -%}
+      <div class="grid cols-4 cross-sell__grid"
+           data-recommendations
+           data-product-id="{{ product.id }}"
+           data-limit="{{ limit }}"
+           data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ limit }}">
+        {%- if recommendations.products_count > 0 -%}
+          {%- for p in recommendations.products limit: limit -%}
+            {%- render 'product-card', product: p -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..limit) -%}
+            <div class="card" style="padding: 18px;">
+              {%- render 'placeholder', swatch: 'pink', label: 'recommandation' -%}
+              <div style="margin-top: 16px;">
+                <h3 class="h-serif" style="font-size: 20px;">Chargement…</h3>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+
+    {%- elsif mode == 'collection' -%}
+      <div class="grid cols-4 cross-sell__grid">
+        {%- for p in products_to_show limit: limit -%}
+          {%- if p.id != product.id -%}
+            {%- render 'product-card', product: p -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  .cross-sell { padding: 80px 0; background: var(--bg-soft); }
+  .cross-sell__heading { font-size: 40px; margin-bottom: 32px; }
+  @media (max-width: 900px) { .cross-sell { padding: 48px 0; } .cross-sell__heading { font-size: 28px; } }
+</style>
+
+<script>
+  (function () {
+    const root = document.querySelector('[data-recommendations]');
+    if (!root || !window.themeSettings) return;
+    const url = root.dataset.url;
+    if (!url) return;
+
+    /* If the server already rendered real recommendations (count > 0),
+       Liquid put product-card markup inside; we don't need to refetch. */
+    if (root.querySelector('[data-product-card]')) return;
+
+    fetch(url)
+      .then(r => r.text())
+      .then(html => {
+        const tpl = document.createElement('div');
+        tpl.innerHTML = html;
+        const grid = tpl.querySelector('[data-recommendations]');
+        if (grid && grid.children.length) {
+          root.innerHTML = grid.innerHTML;
+        }
+      })
+      .catch(() => { /* leave the placeholders */ });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Vous aimerez aussi",
+  "tag": "section",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Titre", "default": "Vous aimerez aussi" },
+    {
+      "type": "select", "id": "mode", "label": "Source", "default": "related",
+      "options": [
+        { "value": "related",    "label": "Recommandations Shopify (automatique)" },
+        { "value": "collection", "label": "Depuis une collection" },
+        { "value": "manual",     "label": "Manuel (depuis les blocs)" }
+      ]
+    },
+    { "type": "collection", "id": "collection", "label": "Collection (mode collection)" },
+    { "type": "range", "id": "limit", "label": "Nombre de produits",
+      "min": 2, "max": 8, "step": 1, "default": 4 }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Produit",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Produit" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Vous aimerez aussi" }
+  ]
+}
+{% endschema %}
