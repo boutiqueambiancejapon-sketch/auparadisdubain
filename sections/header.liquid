@@ -1,12 +1,26 @@
 <header data-site-header class="site-header">
   <div class="container site-header__inner">
     <nav class="site-nav" aria-label="Navigation principale">
-      {%- for link in section.settings.menu.links -%}
-        <a href="{{ link.url }}"
-           class="site-nav__link {% if link.active or link.child_active %}is-active{% endif %}">
-          {{ link.title }}
-        </a>
-      {%- endfor -%}
+      {%- if section.settings.links_text != blank -%}
+        {%- assign lines = section.settings.links_text | newline_to_br | split: '<br />' -%}
+        {%- for raw in lines -%}
+          {%- assign line = raw | strip -%}
+          {%- if line == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign parts = line | split: '|' -%}
+          {%- assign title = parts[0] | strip -%}
+          {%- assign url = parts[1] | strip | default: '#' -%}
+          {%- assign is_active = false -%}
+          {%- if request.path == url -%}{%- assign is_active = true -%}{%- endif -%}
+          <a href="{{ url }}" class="site-nav__link {% if is_active %}is-active{% endif %}">{{ title }}</a>
+        {%- endfor -%}
+      {%- elsif section.settings.menu != blank and section.settings.menu.links.size > 0 -%}
+        {%- for link in section.settings.menu.links -%}
+          <a href="{{ link.url }}"
+             class="site-nav__link {% if link.active or link.child_active %}is-active{% endif %}">
+            {{ link.title }}
+          </a>
+        {%- endfor -%}
+      {%- endif -%}
     </nav>
 
     {%- render 'logo' -%}
@@ -76,11 +90,17 @@
       "content": "Navigation"
     },
     {
+      "type": "textarea",
+      "id": "links_text",
+      "label": "Liens du menu (un par ligne, format \"Titre | URL\")",
+      "default": "Accueil | /\nCollections | /collections\nBombes | /collections/bombes\nSoins | /collections/cremes\nLe Journal | /blogs/le-journal",
+      "info": "Si rempli, ces liens remplacent le menu Shopify."
+    },
+    {
       "type": "link_list",
       "id": "menu",
-      "label": "Menu principal",
-      "default": "main-menu",
-      "info": "Configurez le menu dans Boutique en ligne › Navigation."
+      "label": "Menu Shopify (alternative)",
+      "info": "Utilisé si le champ ci-dessus est vide."
     }
   ]
 }
