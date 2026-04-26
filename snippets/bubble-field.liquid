@@ -1,0 +1,7 @@
+{%- comment -%}
+  Ambient bubble field. Filled at runtime by assets/bubbles.js based on
+  theme settings (bubbles_enabled, bubbles_density).
+{%- endcomment -%}
+{%- if settings.bubbles_enabled -%}
+  <div class="bubble-field" aria-hidden="true"></div>
+{%- endif -%}

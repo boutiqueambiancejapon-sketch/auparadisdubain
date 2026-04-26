@@ -1,0 +1,99 @@
+{
+  "general": {
+    "accessibility": {
+      "skip_to_content": "Aller au contenu",
+      "loading": "Chargement…",
+      "close": "Fermer"
+    },
+    "search": {
+      "placeholder": "Rechercher",
+      "submit": "Rechercher"
+    },
+    "newsletter": {
+      "label": "Email",
+      "placeholder": "votre@email.com",
+      "submit": "S'abonner",
+      "success": "Merci, vous êtes inscrit·e."
+    },
+    "social": {
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "pinterest": "Pinterest",
+      "tiktok": "TikTok"
+    }
+  },
+  "header": {
+    "menu": "Menu",
+    "search": "Rechercher",
+    "account": "Compte",
+    "cart": "Panier",
+    "cart_count": "Panier · {{ count }}"
+  },
+  "footer": {
+    "copyright": "© {{ year }} {{ shop_name }}",
+    "links": "Liens",
+    "shop": "Boutique",
+    "house": "Maison",
+    "service": "Service client"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Ajouter au panier",
+      "added": "✓ Ajouté au panier",
+      "sold_out": "Épuisé",
+      "unavailable": "Indisponible",
+      "quantity": "Quantité",
+      "price": "Prix",
+      "from_price_html": "À partir de {{ price }}",
+      "regular_price": "Prix régulier",
+      "sale_price": "Prix soldé",
+      "wishlist": "♡ Ajouter à ma liste d'envies",
+      "description": "Description",
+      "ingredients": "Ingrédients",
+      "ritual": "Rituel d'usage",
+      "reviews": "Avis ({{ count }})",
+      "read_reviews": "Lire les avis →"
+    }
+  },
+  "collections": {
+    "general": {
+      "products_count": "{{ count }} produits",
+      "no_results": "Aucun produit ne correspond à vos critères.",
+      "load_more": "Charger plus de produits",
+      "sort_by": "Trier",
+      "filters": "Filtres"
+    },
+    "sorting": {
+      "popular": "Popularité",
+      "new": "Nouveautés",
+      "price_asc": "Prix croissant",
+      "price_desc": "Prix décroissant",
+      "rating": "Mieux notés"
+    }
+  },
+  "cart": {
+    "title": "Votre panier",
+    "empty": "Votre panier est vide",
+    "continue": "Continuer mes achats",
+    "subtotal": "Sous-total",
+    "checkout": "Passer la commande",
+    "remove": "Retirer",
+    "quantity": "Quantité"
+  },
+  "search": {
+    "title": "Recherche",
+    "no_results_html": "Aucun résultat pour <strong>{{ terms }}</strong>",
+    "results_for_html": "Résultats pour <strong>{{ terms }}</strong>"
+  },
+  "blogs": {
+    "article": {
+      "by_author": "Par {{ author }}",
+      "read_more": "Lire la suite →"
+    }
+  },
+  "404": {
+    "title": "Page introuvable",
+    "subtext": "Cette page a fondu comme une bombe de bain. Retournez à l'accueil.",
+    "back_home": "Retour à l'accueil"
+  }
+}

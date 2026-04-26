@@ -1,0 +1,24 @@
+{
+  "current": {
+    "palette": "pastel",
+    "bubbles_enabled": true,
+    "bubbles_density": 18,
+    "bubbles_trail": false,
+    "brand_name": "Au Paradis du Bain",
+    "brand_tagline": "DU BAIN",
+    "logo_width": 120,
+    "page_width": 1320
+  },
+  "presets": {
+    "Default": {
+      "palette": "pastel",
+      "bubbles_enabled": true,
+      "bubbles_density": 18,
+      "bubbles_trail": false,
+      "brand_name": "Au Paradis du Bain",
+      "brand_tagline": "DU BAIN",
+      "logo_width": 120,
+      "page_width": 1320
+    }
+  }
+}
