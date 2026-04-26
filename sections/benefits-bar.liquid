@@ -1,0 +1,65 @@
+<section class="benefits-bar">
+  <div class="container benefits-bar__inner" style="grid-template-columns: repeat({{ section.blocks.size }}, 1fr);">
+    {%- for block in section.blocks -%}
+      <div class="benefits-bar__item" {{ block.shopify_attributes }}>
+        <div class="benefits-bar__icon">{{ block.settings.icon }}</div>
+        <div>
+          <div class="benefits-bar__label">{{ block.settings.label }}</div>
+          <div class="benefits-bar__sub">{{ block.settings.sub }}</div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+<style>
+  .benefits-bar {
+    background: var(--bg-soft);
+    padding: 24px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .benefits-bar__inner { display: grid; gap: 24px; }
+  .benefits-bar__item { display: flex; align-items: center; gap: 14px; }
+  .benefits-bar__icon { font-size: 28px; }
+  .benefits-bar__label { font-size: 14px; font-weight: 600; }
+  .benefits-bar__sub { font-size: 12px; color: var(--ink-soft); }
+
+  @media (max-width: 900px) {
+    .benefits-bar__inner { grid-template-columns: repeat(2, 1fr) !important; gap: 16px; }
+  }
+  @media (max-width: 500px) {
+    .benefits-bar__inner { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Barre d'avantages",
+  "tag": "section",
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Avantage",
+      "settings": [
+        { "type": "text", "id": "icon",  "label": "Icône (emoji)", "default": "🌿" },
+        { "type": "text", "id": "label", "label": "Titre",         "default": "Bio & vegan certifié" },
+        { "type": "text", "id": "sub",   "label": "Sous-titre",    "default": "Cosmos Organic" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barre d'avantages",
+      "blocks": [
+        { "type": "benefit", "settings": { "icon": "🌿", "label": "Bio & vegan certifié",  "sub": "Cosmos Organic" } },
+        { "type": "benefit", "settings": { "icon": "🇫🇷", "label": "Fabriqué en France",   "sub": "Ateliers de Grasse" } },
+        { "type": "benefit", "settings": { "icon": "🌸", "label": "Origine contrôlée",     "sub": "Filière transparente" } },
+        { "type": "benefit", "settings": { "icon": "📦", "label": "Livraison offerte",     "sub": "Dès 60€ d'achat" } },
+        { "type": "benefit", "settings": { "icon": "♻️", "label": "Emballages compostables", "sub": "Zéro plastique" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

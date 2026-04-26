@@ -1,0 +1,165 @@
+<section class="featured-collections">
+  <div class="container">
+    <div class="featured-collections__head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="eyebrow" style="margin-bottom: 12px;">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="h-serif featured-collections__heading">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.link_label != blank -%}
+        <a href="{{ section.settings.link_url | default: routes.collections_url }}" class="featured-collections__link">
+          {{ section.settings.link_label }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="featured-collections__grid">
+      {%- for block in section.blocks -%}
+        {%- assign col = collections[block.settings.collection] -%}
+        {%- assign count = col.products_count | default: 0 -%}
+        {%- assign tagline = block.settings.tagline | default: col.metafields.custom.tagline -%}
+        {%- assign swatch = block.settings.swatch | default: col.metafields.custom.swatch | default: 'pink' -%}
+        {%- assign title = block.settings.title_override | default: col.title -%}
+        {%- assign url = col.url | default: '#' -%}
+
+        <a href="{{ url }}"
+           class="featured-collections__card featured-collections__card--{{ swatch }}"
+           data-card-index="{{ forloop.index0 }}"
+           {{ block.shopify_attributes }}>
+          <div class="featured-collections__copy">
+            <span class="eyebrow">
+              {{- forloop.index | prepend: '00' | slice: -2, 2 -}} ·
+              {%- if count > 0 %} {{ count }} produits{% endif -%}
+            </span>
+            <h3 class="h-display featured-collections__card-title{% if forloop.first %} is-feature{% endif %}">
+              {{ title }}
+            </h3>
+            {%- if tagline != blank -%}
+              <p class="featured-collections__tagline">{{ tagline }}</p>
+            {%- endif -%}
+          </div>
+          <div class="featured-collections__cta">
+            <span>Découvrir →</span>
+          </div>
+
+          <div class="featured-collections__bubbles" aria-hidden="true">
+            <span class="featured-collections__bubble featured-collections__bubble--a"></span>
+            <span class="featured-collections__bubble featured-collections__bubble--b"></span>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .featured-collections { padding: 100px 0; }
+  .featured-collections__head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 48px; gap: 24px; flex-wrap: wrap;
+  }
+  .featured-collections__heading { font-size: clamp(40px, 5vw, 64px); }
+  .featured-collections__link { font-size: 14px; font-weight: 500; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+
+  .featured-collections__grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: 280px; gap: 16px;
+  }
+  /* Editorial spans: 1st = big (3x2), then alternating 3x1, 2x1 trio */
+  .featured-collections__card { grid-column: span 2; grid-row: span 1; }
+  .featured-collections__card[data-card-index="0"] { grid-column: span 3; grid-row: span 2; }
+  .featured-collections__card[data-card-index="1"] { grid-column: span 3; grid-row: span 1; }
+  .featured-collections__card[data-card-index="2"] { grid-column: span 3; grid-row: span 1; }
+
+  .featured-collections__card {
+    position: relative; border-radius: var(--radius-lg); overflow: hidden;
+    padding: 32px; display: flex; flex-direction: column; justify-content: space-between;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .featured-collections__card:hover { transform: translateY(-6px); }
+  .featured-collections__card--pink    { background: #FFE9EE; }
+  .featured-collections__card--vanilla { background: #FFF3DC; }
+  .featured-collections__card--mint    { background: #E2F7EE; }
+  .featured-collections__card--lilac   { background: #EAE3FC; }
+
+  .featured-collections__copy { position: relative; z-index: 2; }
+  .featured-collections__card-title { font-size: 32px; margin-top: 12px; line-height: 0.95; }
+  .featured-collections__card-title.is-feature { font-size: 56px; }
+  .featured-collections__tagline { margin-top: 12px; font-size: 14px; color: var(--ink-soft); max-width: 320px; }
+  .featured-collections__cta { display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 2; font-size: 13px; font-weight: 500; }
+
+  .featured-collections__bubbles { position: absolute; top: -30px; right: -30px; width: 200px; height: 200px; pointer-events: none; }
+  .featured-collections__bubble { position: absolute; border-radius: 50%; }
+  .featured-collections__bubble--a { top: 30px; right: 30px; width: 90px; height: 90px; opacity: 0.55; animation: wobble 6s ease-in-out infinite; }
+  .featured-collections__bubble--b { top: 80px; right: 100px; width: 50px; height: 50px; opacity: 0.7; }
+
+  .featured-collections__card--pink    .featured-collections__bubble--a { background: radial-gradient(circle at 30% 30%, #fff, var(--pink-deep)); }
+  .featured-collections__card--pink    .featured-collections__bubble--b { background: radial-gradient(circle at 30% 30%, #fff, var(--pink)); }
+  .featured-collections__card--vanilla .featured-collections__bubble--a { background: radial-gradient(circle at 30% 30%, #fff, var(--vanilla-deep)); }
+  .featured-collections__card--vanilla .featured-collections__bubble--b { background: radial-gradient(circle at 30% 30%, #fff, var(--vanilla)); }
+  .featured-collections__card--mint    .featured-collections__bubble--a { background: radial-gradient(circle at 30% 30%, #fff, var(--mint-deep)); }
+  .featured-collections__card--mint    .featured-collections__bubble--b { background: radial-gradient(circle at 30% 30%, #fff, var(--mint)); }
+  .featured-collections__card--lilac   .featured-collections__bubble--a { background: radial-gradient(circle at 30% 30%, #fff, var(--lilac-deep)); }
+  .featured-collections__card--lilac   .featured-collections__bubble--b { background: radial-gradient(circle at 30% 30%, #fff, var(--lilac)); }
+
+  @media (max-width: 900px) {
+    .featured-collections { padding: 60px 0; }
+    .featured-collections__grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 220px; }
+    .featured-collections__card,
+    .featured-collections__card[data-card-index="0"],
+    .featured-collections__card[data-card-index="1"],
+    .featured-collections__card[data-card-index="2"] { grid-column: span 1; grid-row: span 1; }
+    .featured-collections__card[data-card-index="0"] { grid-column: span 2; grid-row: span 2; }
+    .featured-collections__card-title.is-feature { font-size: 40px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Collections en vedette",
+  "tag": "section",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "· 06 collections" },
+    { "type": "text", "id": "heading", "label": "Titre",   "default": "Choisissez votre rituel." },
+    { "type": "text", "id": "link_label", "label": "Texte du lien", "default": "Voir tout le catalogue →" },
+    { "type": "url",  "id": "link_url",   "label": "Lien" }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "title_override", "label": "Titre (optionnel, écrase le titre Shopify)" },
+        { "type": "text", "id": "tagline", "label": "Tagline (optionnel)" },
+        {
+          "type": "select", "id": "swatch", "label": "Couleur",
+          "options": [
+            { "value": "pink",    "label": "Rose" },
+            { "value": "vanilla", "label": "Vanille" },
+            { "value": "mint",    "label": "Mint" },
+            { "value": "lilac",   "label": "Lilas" }
+          ],
+          "default": "pink"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collections en vedette",
+      "blocks": [
+        { "type": "collection", "settings": { "title_override": "Bombes de bain",  "tagline": "Bouillonnement effervescent",        "swatch": "pink" } },
+        { "type": "collection", "settings": { "title_override": "Sels & infusions", "tagline": "Minéraux purs de l'Himalaya",        "swatch": "lilac" } },
+        { "type": "collection", "settings": { "title_override": "Savons artisanaux","tagline": "Saponifiés à froid en Provence",     "swatch": "vanilla" } },
+        { "type": "collection", "settings": { "title_override": "Crèmes & laits",   "tagline": "Caresses végétales",                  "swatch": "mint" } },
+        { "type": "collection", "settings": { "title_override": "Huiles précieuses","tagline": "Or liquide à fleur de peau",          "swatch": "pink" } },
+        { "type": "collection", "settings": { "title_override": "Coffrets cadeaux", "tagline": "L'art d'offrir le bain",              "swatch": "lilac" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

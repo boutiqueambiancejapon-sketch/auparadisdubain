@@ -1,0 +1,112 @@
+{%- comment -%}
+  Product card matching the original ProductCard component in shared.jsx.
+
+  Args:
+    product: a Shopify product object (required)
+    large:   boolean, larger title
+
+  Optional product metafields used to enrich the card:
+    custom.subtitle  (single_line_text) — short tagline under the name
+    custom.swatch    (single_line_text: pink | vanilla | mint | lilac)
+    reviews.rating          — Shopify Product Reviews compatible
+    reviews.rating_count
+
+  Fallbacks: subtitle from product.description (first sentence),
+  swatch from a stable hash on the handle, rating from 5.
+{%- endcomment -%}
+
+{%- liquid
+  assign p = product
+
+  assign subtitle = p.metafields.custom.subtitle
+  if subtitle == blank
+    assign subtitle = p.description | strip_html | truncate: 80
+  endif
+
+  assign swatch = p.metafields.custom.swatch
+  if swatch == blank
+    assign swatch_palette = 'pink,vanilla,mint,lilac' | split: ','
+    assign swatch_index = p.handle | size | modulo: 4
+    assign swatch = swatch_palette[swatch_index]
+  endif
+
+  assign rating = p.metafields.reviews.rating.value | default: 5
+  assign reviews_count = p.metafields.reviews.rating_count.value | default: 0
+  assign tag_label = p.metafields.custom.badge | default: p.tags.first
+-%}
+
+<a href="{{ p.url }}" class="card product-card" data-product-card>
+  {%- if tag_label != blank -%}
+    <span class="tag tag-{{ swatch }} product-card__badge">{{ tag_label }}</span>
+  {%- endif -%}
+
+  <div class="product-card__media">
+    {%- render 'placeholder', swatch: swatch, label: p.title | downcase, shape: 'square', image: p.featured_image -%}
+    <span class="product-card__hover-bubble" aria-hidden="true"></span>
+  </div>
+
+  <div class="product-card__body">
+    <div class="product-card__row">
+      <h3 class="h-serif product-card__title{% if large %} is-large{% endif %}">{{ p.title }}</h3>
+      <span class="product-card__price">
+        {%- if p.compare_at_price > p.price -%}
+          <s style="color: var(--ink-mute); font-weight: 400; margin-right: 6px;">{{ p.compare_at_price | money }}</s>
+        {%- endif -%}
+        {{ p.price | money }}
+      </span>
+    </div>
+    {%- if subtitle != blank -%}
+      <p class="product-card__subtitle">{{ subtitle }}</p>
+    {%- endif -%}
+    <div class="product-card__rating">
+      {%- render 'stars', rating: rating -%}
+      {%- if reviews_count > 0 -%}
+        <span class="product-card__reviews">({{ reviews_count }})</span>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <span class="product-card__arrow" aria-hidden="true">→</span>
+</a>
+
+<style>
+  .product-card {
+    position: relative;
+    padding: 18px;
+    display: block;
+    color: inherit;
+  }
+  .product-card__badge { position: absolute; top: 26px; left: 26px; z-index: 2; }
+  .product-card__media { position: relative; }
+  .product-card__hover-bubble {
+    position: absolute; top: 10px; right: 10px; width: 36px; height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,0.3));
+    border: 1px solid rgba(255,255,255,0.7);
+    opacity: 0;
+    transform: translateY(8px) scale(0.6);
+    transition: all .4s cubic-bezier(.34,1.56,.64,1);
+    pointer-events: none;
+  }
+  .product-card:hover .product-card__hover-bubble { opacity: 1; transform: translateY(0) scale(1); }
+
+  .product-card__body { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .product-card__row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .product-card__title { font-size: 20px; font-weight: 500; }
+  .product-card__title.is-large { font-size: 24px; }
+  .product-card__price { font-weight: 600; font-size: 16px; white-space: nowrap; }
+  .product-card__subtitle { color: var(--ink-soft); font-size: 13px; line-height: 1.4; }
+  .product-card__rating { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .product-card__reviews { font-size: 12px; color: var(--ink-mute); }
+
+  .product-card__arrow {
+    position: absolute; right: 18px; bottom: 18px;
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--ink); color: var(--bg);
+    font-size: 14px; font-weight: 600;
+    opacity: 0; transform: scale(0.5);
+    transition: all .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .product-card:hover .product-card__arrow { opacity: 1; transform: scale(1); }
+</style>
