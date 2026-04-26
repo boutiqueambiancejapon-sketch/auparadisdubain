@@ -1,0 +1,43 @@
+{%- comment -%}
+  Striped pastel placeholder used when an image is missing, or as the
+  decorative background behind real product images.
+
+  Args:
+    swatch: pink | vanilla | mint | lilac (default: pink)
+    label:  short caption shown in monospace
+    shape:  square | circle | tall (default: square)
+    image:  Shopify image object (optional). When provided, it overlays the
+            stripes so the visual rhythm of the design is preserved.
+    small:  shrink the caption font size
+{%- endcomment -%}
+
+{%- assign sw = swatch | default: 'pink' -%}
+{%- assign shp = shape | default: 'square' -%}
+
+{%- case sw -%}
+  {%- when 'pink'    -%}{%- assign ph_a = 'rgba(244,166,188,.55)' -%}{%- assign ph_b = 'rgba(244,166,188,.85)' -%}{%- assign ph_bg = '#FFE9EE' -%}
+  {%- when 'vanilla' -%}{%- assign ph_a = 'rgba(242,217,160,.55)' -%}{%- assign ph_b = 'rgba(242,217,160,.85)' -%}{%- assign ph_bg = '#FFF3DC' -%}
+  {%- when 'mint'    -%}{%- assign ph_a = 'rgba(156,217,197,.55)' -%}{%- assign ph_b = 'rgba(156,217,197,.85)' -%}{%- assign ph_bg = '#E2F7EE' -%}
+  {%- when 'lilac'   -%}{%- assign ph_a = 'rgba(182,169,240,.55)' -%}{%- assign ph_b = 'rgba(182,169,240,.85)' -%}{%- assign ph_bg = '#EAE3FC' -%}
+{%- endcase -%}
+
+{%- if shp == 'circle' -%}
+  {%- assign radius = '50%' -%}{%- assign aspect = '1 / 1' -%}
+{%- elsif shp == 'tall' -%}
+  {%- assign radius = 'var(--radius-lg)' -%}{%- assign aspect = '3 / 4' -%}
+{%- else -%}
+  {%- assign radius = 'var(--radius-lg)' -%}{%- assign aspect = '1 / 1' -%}
+{%- endif -%}
+
+<div class="placeholder"
+     style="--ph-a: {{ ph_a }}; --ph-b: {{ ph_b }}; --ph-bg: {{ ph_bg }}; border-radius: {{ radius }}; aspect-ratio: {{ aspect }}; width: 100%;">
+  {%- if image != blank -%}
+    {{ image | image_url: width: 800 | image_tag:
+        loading: 'lazy',
+        widths: '300, 600, 900, 1200',
+        sizes: '(max-width: 900px) 50vw, 25vw',
+        alt: image.alt | default: label | escape }}
+  {%- else -%}
+    <span style="font-size: {% if small %}10px{% else %}12px{% endif %};">{{ '// ' | append: label }}</span>
+  {%- endif -%}
+</div>
