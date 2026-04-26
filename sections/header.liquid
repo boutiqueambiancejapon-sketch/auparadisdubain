@@ -1,12 +1,87 @@
-{%- comment -%} Stub — remplacé au Stage 2 {%- endcomment -%}
-<header data-site-header style="padding: 24px 0; border-bottom: 1px solid var(--line);">
-  <div class="container">
-    <a href="{{ routes.root_url }}" class="h-display" style="font-size: 24px;">{{ settings.brand_name }}</a>
+<header data-site-header class="site-header">
+  <div class="container site-header__inner">
+    <nav class="site-nav" aria-label="Navigation principale">
+      {%- for link in section.settings.menu.links -%}
+        <a href="{{ link.url }}"
+           class="site-nav__link {% if link.active or link.child_active %}is-active{% endif %}">
+          {{ link.title }}
+        </a>
+      {%- endfor -%}
+    </nav>
+
+    {%- render 'logo' -%}
+
+    <div class="site-header__actions">
+      <button type="button" class="btn btn-sm btn-secondary site-header__action" data-search-toggle
+              style="border-color: var(--line-strong);">
+        {{ 'header.search' | t }}
+      </button>
+      <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+         class="btn btn-sm btn-secondary site-header__action"
+         style="border-color: var(--line-strong);">
+        {{ 'header.account' | t }}
+      </a>
+      <a href="{{ routes.cart_url }}"
+         class="btn btn-sm site-header__action site-header__cart"
+         style="background: var(--pink-deep); color: var(--ink);">
+        {{ 'header.cart' | t }} · <span data-cart-count>{{ cart.item_count }}</span>
+      </a>
+    </div>
   </div>
 </header>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background .3s, backdrop-filter .3s, border-color .3s;
+  }
+  .site-header[data-scrolled="true"] {
+    background: rgba(255, 249, 244, 0.85);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-bottom-color: var(--line);
+  }
+  [data-palette="cool"] .site-header[data-scrolled="true"] { background: rgba(246, 251, 250, 0.85); }
+  [data-palette="candy"] .site-header[data-scrolled="true"] { background: rgba(255, 246, 248, 0.85); }
+
+  .site-header__inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 76px; gap: 24px;
+  }
+  .site-nav { display: flex; gap: 24px; font-size: 14px; font-weight: 500; white-space: nowrap; }
+  .site-nav__link {
+    color: var(--ink-soft);
+    position: relative; padding: 4px 0;
+    transition: color .2s;
+  }
+  .site-nav__link:hover, .site-nav__link.is-active { color: var(--ink); }
+  .site-header__actions { display: flex; gap: 8px; align-items: center; }
+  .site-header__cart { font-weight: 600; }
+
+  @media (max-width: 900px) {
+    .site-nav { display: none; }
+    .site-header__action:not(.site-header__cart) { display: none; }
+    .site-header__inner { height: 64px; }
+  }
+</style>
+
 {% schema %}
 {
   "name": "En-tête",
-  "settings": []
+  "settings": [
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu principal",
+      "default": "main-menu",
+      "info": "Configurez le menu dans Boutique en ligne › Navigation."
+    }
+  ]
 }
 {% endschema %}

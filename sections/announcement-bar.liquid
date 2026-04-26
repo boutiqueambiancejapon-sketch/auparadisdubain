@@ -1,7 +1,54 @@
-{%- comment -%} Stub — remplacé au Stage 2 {%- endcomment -%}
+<div class="announcement-bar">
+  <div class="marquee">
+    <div class="marquee-track">
+      {%- for i in (1..2) -%}
+        {%- for block in section.blocks -%}
+          <span>{{ block.settings.text }}</span>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+<style>
+  .announcement-bar {
+    background: var(--ink);
+    color: var(--bg);
+    text-align: center;
+    padding: 10px 0;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    position: relative;
+    z-index: 60;
+  }
+</style>
+
 {% schema %}
 {
   "name": "Barre d'annonce",
-  "settings": []
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texte",
+          "default": "✿ Livraison offerte dès 60€"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "message", "settings": { "text": "✿ Livraison offerte dès 60€" } },
+      { "type": "message", "settings": { "text": "♡ Échantillons surprises dans chaque commande" } },
+      { "type": "message", "settings": { "text": "☼ -15% sur votre 1ʳᵉ commande avec PARADIS15" } },
+      { "type": "message", "settings": { "text": "☾ Emballages compostables" } },
+      { "type": "message", "settings": { "text": "✦ Made in France · Saponifié à froid en Provence" } }
+    ]
+  }
 }
 {% endschema %}
