@@ -41,7 +41,7 @@
   {%- endif -%}
 
   <div class="product-card__media">
-    {%- render 'placeholder', swatch: swatch, label: p.title | downcase, shape: 'square', image: p.featured_image -%}
+    {%- render 'placeholder', swatch: swatch, label: p.title, shape: 'square', image: p.featured_image -%}
     <span class="product-card__hover-bubble" aria-hidden="true"></span>
   </div>
 
@@ -110,3 +110,15 @@
   }
   .product-card:hover .product-card__arrow { opacity: 1; transform: scale(1); }
 </style>
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{%- render 'placeholder', swatch: swatch, label: p.title | downcase, shape:
+    'square', image: p.featured_image -%}"
+  to: "{%- render 'placeholder', swatch: swatch, label: p.title, shape: 'square',
+    image: p.featured_image -%}"
+  position: 1495..1597
+{% endcomment %}

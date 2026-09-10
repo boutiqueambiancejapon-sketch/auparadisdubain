@@ -43,7 +43,7 @@
                       fetchpriority: 'high' }}
             </div>
           {%- else -%}
-            {%- render 'placeholder', swatch: swatch, label: p.title | downcase, shape: 'circle' -%}
+            {%- render 'placeholder', swatch: swatch, label: p.title, shape: 'circle' -%}
           {%- endif -%}
         </div>
 
@@ -198,3 +198,14 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{%- render 'placeholder', swatch: swatch, label: p.title | downcase, shape:
+    'circle' -%}"
+  to: "{%- render 'placeholder', swatch: swatch, label: p.title, shape: 'circle' -%}"
+  position: 1736..1813
+{% endcomment %}

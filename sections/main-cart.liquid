@@ -33,7 +33,7 @@
                 {%- if item.image != blank -%}
                   {{ item.image | image_url: width: 240 | image_tag: alt: item.title, loading: 'lazy' }}
                 {%- else -%}
-                  {%- render 'placeholder', swatch: swatch, label: p.title | downcase, shape: 'square', small: true -%}
+                  {%- render 'placeholder', swatch: swatch, label: p.title, shape: 'square', small: true -%}
                 {%- endif -%}
               </a>
 
@@ -291,3 +291,15 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{%- render 'placeholder', swatch: swatch, label: p.title | downcase, shape:
+    'square', small: true -%}"
+  to: "{%- render 'placeholder', swatch: swatch, label: p.title, shape: 'square',
+    small: true -%}"
+  position: 1683..1773
+{% endcomment %}

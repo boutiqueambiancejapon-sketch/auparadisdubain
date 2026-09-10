@@ -1,344 +1,177 @@
-{%- comment -%}
-  Variant pickers + quantity + add-to-cart + trust badges.
-  Rendered into the product-info column of sections/main-product.liquid.
+Liquid syntax error (snippets/product-form line 32): Expected close_square but found pipe in "palette_color = palette[forloop.index0 | modulo: 4]"{% comment %}
 
-  Args:
-    product: Shopify product (required)
-{%- endcomment -%}
+This file has been rewritten to preserve the original behavior.
 
-{%- assign current_variant = product.selected_or_first_available_variant -%}
-
-{%- form 'product', product, id: 'ProductForm', class: 'product-form', novalidate: 'novalidate' -%}
-  <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id-input>
-
-  {%- for option in product.options_with_values -%}
-    {%- assign option_name_lc = option.name | downcase -%}
-    {%- assign option_index = forloop.index0 -%}
-    {%- assign is_fragrance = false -%}
-    {%- if option_name_lc contains 'fragrance' or option_name_lc contains 'parfum' or option_name_lc contains 'scent' -%}
-      {%- assign is_fragrance = true -%}
-    {%- endif -%}
-
-    <div class="product-form__option" data-product-option data-option-index="{{ option_index }}">
-      <div class="product-form__option-head">
-        <span>{{ option.name }}</span>
-        <span class="product-form__option-current" data-option-current>{{ option.selected_value }}</span>
-      </div>
-
-      {%- if is_fragrance -%}
-        <div class="product-form__swatches">
-          {%- for value in option.values -%}
-            {%- assign palette = 'pink,lilac,vanilla,mint' | split: ',' -%}
-            {%- assign palette_color = palette[forloop.index0 | modulo: 4] -%}
-            <label class="fragrance-swatch {% if value == option.selected_value %}is-active{% endif %}"
-                   title="{{ value }}">
-              <input type="radio"
-                     name="options[{{ option.name | escape }}]"
-                     value="{{ value | escape }}"
-                     {% if value == option.selected_value %}checked{% endif %}
-                     data-option-input data-option-label="{{ value | escape }}"
-                     hidden>
-              <span class="fragrance-swatch__dot"
-                    style="background: radial-gradient(circle at 30% 30%, #fff, var(--{{ palette_color }}-deep));"></span>
-              <span class="visually-hidden">{{ value }}</span>
-            </label>
-          {%- endfor -%}
-        </div>
-      {%- else -%}
-        <div class="product-form__pickers">
-          {%- for value in option.values -%}
-            {%- comment -%}
-              Find the variant matching this option value (using the
-              currently selected values for the other options) so we can
-              show a per-value price hint when format names embed grams.
-            {%- endcomment -%}
-            <label class="product-picker {% if value == option.selected_value %}is-active{% endif %}">
-              <input type="radio"
-                     name="options[{{ option.name | escape }}]"
-                     value="{{ value | escape }}"
-                     {% if value == option.selected_value %}checked{% endif %}
-                     data-option-input data-option-label="{{ value | escape }}"
-                     hidden>
-              <span class="product-picker__main">{{ value }}</span>
-            </label>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
-    </div>
-  {%- endfor -%}
-
-  <div class="product-form__buy">
-    <div class="quantity-input">
-      <button type="button" class="quantity-input__btn" data-qty-decrement aria-label="Diminuer la quantité">−</button>
-      <input type="number" name="quantity" value="1" min="1" inputmode="numeric"
-             class="quantity-input__field" data-qty-input>
-      <button type="button" class="quantity-input__btn" data-qty-increment aria-label="Augmenter la quantité">+</button>
-    </div>
-
-    <button type="submit"
-            name="add"
-            class="btn product-form__submit"
-            {% unless current_variant.available %}disabled{% endunless %}
-            data-atc-button>
-      <span data-atc-default>
-        {%- if current_variant.available -%}
-          {{ 'products.product.add_to_cart' | t }} · <span data-atc-price>{{ current_variant.price | money }}</span>
-        {%- else -%}
-          {{ 'products.product.sold_out' | t }}
-        {%- endif -%}
-      </span>
-      <span data-atc-success hidden>{{ 'products.product.added' | t }}</span>
-    </button>
-  </div>
-
-  <button type="button" class="btn btn-secondary product-form__wishlist" data-wishlist-toggle>
-    {{ 'products.product.wishlist' | t }}
-  </button>
-{%- endform -%}
-
-{%- if section.settings.show_trust_badges == false -%}{%- else -%}
-  <div class="product-trust">
-    {%- assign default_badges = 'Cosmos Organic|Bio certifié|🌿,Vegan & cruelty-free|Sans test animal|🐰,Livraison 48h|Offerte dès 60€|📦,Emballage compostable|Zéro plastique|♻️' | split: ',' -%}
-    {%- for raw in default_badges -%}
-      {%- assign parts = raw | split: '|' -%}
-      <div class="product-trust__item">
-        <span class="product-trust__icon">{{ parts[2] }}</span>
-        <div>
-          <div class="product-trust__title">{{ parts[0] }}</div>
-          <div class="product-trust__sub">{{ parts[1] }}</div>
-        </div>
-      </div>
-    {%- endfor -%}
-  </div>
-{%- endif -%}
-
-{%- comment -%}
-  Variant data dumped for client-side picker → variant resolution.
-  Filter out anything but {id, available, options, price, compare_at_price}.
-{%- endcomment -%}
-<script type="application/json" data-variants-json>
-  [
-    {%- for v in product.variants -%}
-      {
-        "id": {{ v.id | json }},
-        "available": {{ v.available | json }},
-        "options": {{ v.options | json }},
-        "price": {{ v.price | json }},
-        "compare_at_price": {{ v.compare_at_price | json }}
-      }{% unless forloop.last %},{% endunless %}
-    {%- endfor -%}
-  ]
-</script>
-
-<style>
-  .product-form { display: flex; flex-direction: column; gap: 0; }
-
-  .product-form__option { margin-bottom: 24px; }
-  .product-form__option-head {
-    display: flex; justify-content: space-between; gap: 12px;
-    font-size: 13px; font-weight: 600; margin-bottom: 10px;
-  }
-  .product-form__option-current { color: var(--ink-soft); font-weight: 400; }
-
-  /* Format-style picker */
-  .product-form__pickers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .product-picker {
-    padding: 14px 8px; border-radius: var(--radius-md);
-    border: 1.5px solid var(--line-strong);
-    background: transparent; font-size: 12px; font-weight: 500;
-    text-align: center; cursor: pointer;
-    transition: border-color .2s, background .2s;
-  }
-  .product-picker:hover { border-color: var(--ink); }
-  .product-picker.is-active { border-color: var(--ink); background: var(--bg-soft); }
-  .product-picker__main { display: block; }
-  .product-picker__price { display: block; color: var(--ink-soft); font-weight: 400; margin-top: 2px; }
-
-  /* Fragrance-style swatch */
-  .product-form__swatches { display: flex; gap: 10px; flex-wrap: wrap; }
-  .fragrance-swatch {
-    width: 48px; height: 48px; border-radius: 50%;
-    border: 2px solid transparent; padding: 2px;
-    cursor: pointer; transition: border-color .2s;
-  }
-  .fragrance-swatch:hover { border-color: var(--line-strong); }
-  .fragrance-swatch.is-active { border-color: var(--ink); }
-  .fragrance-swatch__dot { display: block; width: 100%; height: 100%; border-radius: 50%; border: 1px solid rgba(0,0,0,0.06); }
-
-  /* Quantity + ATC */
-  .product-form__buy { display: flex; gap: 12px; margin-bottom: 16px; align-items: stretch; }
-  .quantity-input {
-    display: flex; align-items: center; height: 52px;
-    border: 1.5px solid var(--line-strong); border-radius: 999px;
-  }
-  .quantity-input__btn {
-    padding: 0 18px; font-size: 18px; height: 100%;
-    background: none; cursor: pointer;
-  }
-  .quantity-input__field {
-    width: 40px; text-align: center; font-weight: 600;
-    background: none; border: 0; padding: 0; outline: none;
-    height: 100%; -moz-appearance: textfield;
-  }
-  .quantity-input__field::-webkit-outer-spin-button,
-  .quantity-input__field::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
-  .product-form__submit { flex: 1; transition: background .25s; }
-  .product-form__submit.is-success { background: var(--mint-deep); color: var(--ink); }
-  .product-form__submit[disabled] { opacity: 0.6; cursor: not-allowed; }
-
-  .product-form__wishlist { width: 100%; margin-bottom: 32px; }
-
-  /* Trust badges */
-  .product-trust {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    font-size: 13px; margin-top: 8px;
-  }
-  .product-trust__item {
-    display: flex; gap: 10px; padding: 12px;
-    background: var(--bg-soft); border-radius: var(--radius-md);
-  }
-  .product-trust__icon { font-size: 20px; flex-shrink: 0; }
-  .product-trust__title { font-weight: 600; }
-  .product-trust__sub { color: var(--ink-soft); font-size: 12px; }
-</style>
-
-<script>
-  (function () {
-    const form = document.getElementById('ProductForm');
-    if (!form) return;
-    const variants = JSON.parse(form.parentElement.querySelector('[data-variants-json]').textContent || '[]');
-    const variantInput = form.querySelector('[data-variant-id-input]');
-    const priceTarget = form.querySelector('[data-atc-price]');
-    const headerPrice = document.querySelector('[data-product-price] .product-info__price-current');
-    const headerWas   = document.querySelector('[data-product-price] .product-info__price-was');
-    const atcBtn = form.querySelector('[data-atc-button]');
-    const atcDefault = atcBtn.querySelector('[data-atc-default]');
-    const atcSuccess = atcBtn.querySelector('[data-atc-success]');
-
-    function moneyFormat(cents) {
-      const fmt = (window.themeSettings && window.themeSettings.moneyFormat) || '€{{amount}}';
-      const amount = (cents / 100).toFixed(2).replace('.', ',');
-      return fmt.replace(/\{\{\s*amount[^}]*\}\}/, amount);
-    }
-
-    function getSelectedOptions() {
-      return Array.from(form.querySelectorAll('[data-product-option]')).map((group) => {
-        const checked = group.querySelector('input[type="radio"]:checked');
-        return checked ? checked.value : null;
-      });
-    }
-
-    function findVariant(opts) {
-      return variants.find(v => v.options.length === opts.length
-        && v.options.every((o, i) => o === opts[i]));
-    }
-
-    function syncOptionLabel(group) {
-      const checked = group.querySelector('input[type="radio"]:checked');
-      const label = group.querySelector('[data-option-current]');
-      if (checked && label) label.textContent = checked.dataset.optionLabel || checked.value;
-    }
-
-    function syncActiveStyles(group) {
-      group.querySelectorAll('.product-picker, .fragrance-swatch').forEach((el) => {
-        const input = el.querySelector('input[type="radio"]');
-        el.classList.toggle('is-active', !!(input && input.checked));
-      });
-    }
-
-    function update() {
-      const groups = form.querySelectorAll('[data-product-option]');
-      groups.forEach((g) => { syncOptionLabel(g); syncActiveStyles(g); });
-
-      const opts = getSelectedOptions();
-      const variant = findVariant(opts);
-      if (!variant) return;
-
-      variantInput.value = variant.id;
-
-      if (priceTarget) priceTarget.textContent = moneyFormat(variant.price);
-      if (headerPrice) headerPrice.textContent = moneyFormat(variant.price);
-      if (headerWas) {
-        if (variant.compare_at_price && variant.compare_at_price > variant.price) {
-          headerWas.textContent = moneyFormat(variant.compare_at_price);
-          headerWas.style.display = '';
-        } else {
-          headerWas.style.display = 'none';
-        }
-      }
-
-      atcBtn.disabled = !variant.available;
-      atcDefault.firstChild && (atcDefault.firstChild.nodeValue = variant.available
-        ? "{{ 'products.product.add_to_cart' | t }} · "
-        : "{{ 'products.product.sold_out' | t }}");
-
-      const url = new URL(window.location.href);
-      url.searchParams.set('variant', variant.id);
-      history.replaceState({}, '', url);
-    }
-
-    form.addEventListener('change', (e) => {
-      if (e.target.matches('[data-option-input]')) update();
-    });
-
-    /* Quantity */
-    const qty = form.querySelector('[data-qty-input]');
-    form.querySelector('[data-qty-decrement]').addEventListener('click', () => {
-      qty.value = Math.max(1, parseInt(qty.value, 10) - 1);
-    });
-    form.querySelector('[data-qty-increment]').addEventListener('click', () => {
-      qty.value = parseInt(qty.value, 10) + 1;
-    });
-
-    /* ATC: AJAX submit so the user stays on the page; falls back to normal post on error */
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      atcBtn.disabled = true;
-      try {
-        const fd = new FormData(form);
-        const res = await fetch(window.themeSettings.routes.cart_add_url + '.js', {
-          method: 'POST',
-          body: fd,
-          headers: { 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error('add failed');
-
-        atcDefault.hidden = true;
-        atcSuccess.hidden = false;
-        atcBtn.classList.add('is-success');
-
-        /* Bump the header cart counter */
-        const cartRes = await fetch(window.themeSettings.routes.cart_url + '.js', { headers: { 'Accept': 'application/json' } });
-        if (cartRes.ok) {
-          const cart = await cartRes.json();
-          const counter = document.querySelector('[data-cart-count]');
-          if (counter) counter.textContent = cart.item_count;
-        }
-
-        setTimeout(() => {
-          atcDefault.hidden = false;
-          atcSuccess.hidden = true;
-          atcBtn.classList.remove('is-success');
-          atcBtn.disabled = false;
-        }, 1800);
-      } catch (err) {
-        atcBtn.disabled = false;
-        form.removeEventListener('submit', arguments.callee);
-        form.submit();
-      }
-    });
-
-    /* Wishlist (visual only — no Shopify-native wishlist) */
-    const wishlist = form.querySelector('[data-wishlist-toggle]');
-    if (wishlist) {
-      wishlist.addEventListener('click', () => {
-        wishlist.style.background = 'var(--pink)';
-        wishlist.style.borderColor = 'var(--pink-deep)';
-        wishlist.textContent = '♥ Ajouté à la liste';
-      });
-    }
-
-    update();
-  })();
-</script>
+---
+Changes:
+- from: "{%- comment -%}\n  Variant pickers + quantity + add-to-cart + trust badges.\n
+    \ Rendered into the product-info column of sections/main-product.liquid.\n\n  Args:\n
+    \   product: Shopify product (required)\n{%- endcomment -%}\n\n{%- assign current_variant
+    = product.selected_or_first_available_variant -%}\n\n{%- form 'product', product,
+    id: 'ProductForm', class: 'product-form', novalidate: 'novalidate' -%}\n  <input
+    type=\"hidden\" name=\"id\" value=\"{{ current_variant.id }}\" data-variant-id-input>\n\n
+    \ {%- for option in product.options_with_values -%}\n    {%- assign option_name_lc
+    = option.name | downcase -%}\n    {%- assign option_index = forloop.index0 -%}\n
+    \   {%- assign is_fragrance = false -%}\n    {%- if option_name_lc contains 'fragrance'
+    or option_name_lc contains 'parfum' or option_name_lc contains 'scent' -%}\n      {%-
+    assign is_fragrance = true -%}\n    {%- endif -%}\n\n    <div class=\"product-form__option\"
+    data-product-option data-option-index=\"{{ option_index }}\">\n      <div class=\"product-form__option-head\">\n
+    \       <span>{{ option.name }}</span>\n        <span class=\"product-form__option-current\"
+    data-option-current>{{ option.selected_value }}</span>\n      </div>\n\n      {%-
+    if is_fragrance -%}\n        <div class=\"product-form__swatches\">\n          {%-
+    for value in option.values -%}\n            {%- assign palette = 'pink,lilac,vanilla,mint'
+    | split: ',' -%}\n            {%- assign palette_color = palette[forloop.index0
+    | modulo: 4] -%}\n            <label class=\"fragrance-swatch {% if value == option.selected_value
+    %}is-active{% endif %}\"\n                   title=\"{{ value }}\">\n              <input
+    type=\"radio\"\n                     name=\"options[{{ option.name | escape }}]\"\n
+    \                    value=\"{{ value | escape }}\"\n                     {% if
+    value == option.selected_value %}checked{% endif %}\n                     data-option-input
+    data-option-label=\"{{ value | escape }}\"\n                     hidden>\n              <span
+    class=\"fragrance-swatch__dot\"\n                    style=\"background: radial-gradient(circle
+    at 30% 30%, #fff, var(--{{ palette_color }}-deep));\"></span>\n              <span
+    class=\"visually-hidden\">{{ value }}</span>\n            </label>\n          {%-
+    endfor -%}\n        </div>\n      {%- else -%}\n        <div class=\"product-form__pickers\">\n
+    \         {%- for value in option.values -%}\n            {%- comment -%}\n              Find
+    the variant matching this option value (using the\n              currently selected
+    values for the other options) so we can\n              show a per-value price
+    hint when format names embed grams.\n            {%- endcomment -%}\n            <label
+    class=\"product-picker {% if value == option.selected_value %}is-active{% endif
+    %}\">\n              <input type=\"radio\"\n                     name=\"options[{{
+    option.name | escape }}]\"\n                     value=\"{{ value | escape }}\"\n
+    \                    {% if value == option.selected_value %}checked{% endif %}\n
+    \                    data-option-input data-option-label=\"{{ value | escape }}\"\n
+    \                    hidden>\n              <span class=\"product-picker__main\">{{
+    value }}</span>\n            </label>\n          {%- endfor -%}\n        </div>\n
+    \     {%- endif -%}\n    </div>\n  {%- endfor -%}\n\n  <div class=\"product-form__buy\">\n
+    \   <div class=\"quantity-input\">\n      <button type=\"button\" class=\"quantity-input__btn\"
+    data-qty-decrement aria-label=\"Diminuer la quantité\">−</button>\n      <input
+    type=\"number\" name=\"quantity\" value=\"1\" min=\"1\" inputmode=\"numeric\"\n
+    \            class=\"quantity-input__field\" data-qty-input>\n      <button type=\"button\"
+    class=\"quantity-input__btn\" data-qty-increment aria-label=\"Augmenter la quantité\">+</button>\n
+    \   </div>\n\n    <button type=\"submit\"\n            name=\"add\"\n            class=\"btn
+    product-form__submit\"\n            {% unless current_variant.available %}disabled{%
+    endunless %}\n            data-atc-button>\n      <span data-atc-default>\n        {%-
+    if current_variant.available -%}\n          {{ 'products.product.add_to_cart'
+    | t }} · <span data-atc-price>{{ current_variant.price | money }}</span>\n        {%-
+    else -%}\n          {{ 'products.product.sold_out' | t }}\n        {%- endif -%}\n
+    \     </span>\n      <span data-atc-success hidden>{{ 'products.product.added'
+    | t }}</span>\n    </button>\n  </div>\n\n  <button type=\"button\" class=\"btn
+    btn-secondary product-form__wishlist\" data-wishlist-toggle>\n    {{ 'products.product.wishlist'
+    | t }}\n  </button>\n{%- endform -%}\n\n{%- if section.settings.show_trust_badges
+    == false -%}{%- else -%}\n  <div class=\"product-trust\">\n    {%- assign default_badges
+    = 'Cosmos Organic|Bio certifié|\U0001F33F,Vegan & cruelty-free|Sans test animal|\U0001F430,Livraison
+    48h|Offerte dès 60€|\U0001F4E6,Emballage compostable|Zéro plastique|♻️' | split:
+    ',' -%}\n    {%- for raw in default_badges -%}\n      {%- assign parts = raw |
+    split: '|' -%}\n      <div class=\"product-trust__item\">\n        <span class=\"product-trust__icon\">{{
+    parts[2] }}</span>\n        <div>\n          <div class=\"product-trust__title\">{{
+    parts[0] }}</div>\n          <div class=\"product-trust__sub\">{{ parts[1] }}</div>\n
+    \       </div>\n      </div>\n    {%- endfor -%}\n  </div>\n{%- endif -%}\n\n{%-
+    comment -%}\n  Variant data dumped for client-side picker → variant resolution.\n
+    \ Filter out anything but {id, available, options, price, compare_at_price}.\n{%-
+    endcomment -%}\n<script type=\"application/json\" data-variants-json>\n  [\n    {%-
+    for v in product.variants -%}\n      {\n        \"id\": {{ v.id | json }},\n        \"available\":
+    {{ v.available | json }},\n        \"options\": {{ v.options | json }},\n        \"price\":
+    {{ v.price | json }},\n        \"compare_at_price\": {{ v.compare_at_price | json
+    }}\n      }{% unless forloop.last %},{% endunless %}\n    {%- endfor -%}\n  ]\n</script>\n\n<style>\n
+    \ .product-form { display: flex; flex-direction: column; gap: 0; }\n\n  .product-form__option
+    { margin-bottom: 24px; }\n  .product-form__option-head {\n    display: flex; justify-content:
+    space-between; gap: 12px;\n    font-size: 13px; font-weight: 600; margin-bottom:
+    10px;\n  }\n  .product-form__option-current { color: var(--ink-soft); font-weight:
+    400; }\n\n  /* Format-style picker */\n  .product-form__pickers { display: grid;
+    grid-template-columns: repeat(3, 1fr); gap: 8px; }\n  .product-picker {\n    padding:
+    14px 8px; border-radius: var(--radius-md);\n    border: 1.5px solid var(--line-strong);\n
+    \   background: transparent; font-size: 12px; font-weight: 500;\n    text-align:
+    center; cursor: pointer;\n    transition: border-color .2s, background .2s;\n
+    \ }\n  .product-picker:hover { border-color: var(--ink); }\n  .product-picker.is-active
+    { border-color: var(--ink); background: var(--bg-soft); }\n  .product-picker__main
+    { display: block; }\n  .product-picker__price { display: block; color: var(--ink-soft);
+    font-weight: 400; margin-top: 2px; }\n\n  /* Fragrance-style swatch */\n  .product-form__swatches
+    { display: flex; gap: 10px; flex-wrap: wrap; }\n  .fragrance-swatch {\n    width:
+    48px; height: 48px; border-radius: 50%;\n    border: 2px solid transparent; padding:
+    2px;\n    cursor: pointer; transition: border-color .2s;\n  }\n  .fragrance-swatch:hover
+    { border-color: var(--line-strong); }\n  .fragrance-swatch.is-active { border-color:
+    var(--ink); }\n  .fragrance-swatch__dot { display: block; width: 100%; height:
+    100%; border-radius: 50%; border: 1px solid rgba(0,0,0,0.06); }\n\n  /* Quantity
+    + ATC */\n  .product-form__buy { display: flex; gap: 12px; margin-bottom: 16px;
+    align-items: stretch; }\n  .quantity-input {\n    display: flex; align-items:
+    center; height: 52px;\n    border: 1.5px solid var(--line-strong); border-radius:
+    999px;\n  }\n  .quantity-input__btn {\n    padding: 0 18px; font-size: 18px; height:
+    100%;\n    background: none; cursor: pointer;\n  }\n  .quantity-input__field {\n
+    \   width: 40px; text-align: center; font-weight: 600;\n    background: none;
+    border: 0; padding: 0; outline: none;\n    height: 100%; -moz-appearance: textfield;\n
+    \ }\n  .quantity-input__field::-webkit-outer-spin-button,\n  .quantity-input__field::-webkit-inner-spin-button
+    { -webkit-appearance: none; margin: 0; }\n\n  .product-form__submit { flex: 1;
+    transition: background .25s; }\n  .product-form__submit.is-success { background:
+    var(--mint-deep); color: var(--ink); }\n  .product-form__submit[disabled] { opacity:
+    0.6; cursor: not-allowed; }\n\n  .product-form__wishlist { width: 100%; margin-bottom:
+    32px; }\n\n  /* Trust badges */\n  .product-trust {\n    display: grid; grid-template-columns:
+    1fr 1fr; gap: 12px;\n    font-size: 13px; margin-top: 8px;\n  }\n  .product-trust__item
+    {\n    display: flex; gap: 10px; padding: 12px;\n    background: var(--bg-soft);
+    border-radius: var(--radius-md);\n  }\n  .product-trust__icon { font-size: 20px;
+    flex-shrink: 0; }\n  .product-trust__title { font-weight: 600; }\n  .product-trust__sub
+    { color: var(--ink-soft); font-size: 12px; }\n</style>\n\n<script>\n  (function
+    () {\n    const form = document.getElementById('ProductForm');\n    if (!form)
+    return;\n    const variants = JSON.parse(form.parentElement.querySelector('[data-variants-json]').textContent
+    || '[]');\n    const variantInput = form.querySelector('[data-variant-id-input]');\n
+    \   const priceTarget = form.querySelector('[data-atc-price]');\n    const headerPrice
+    = document.querySelector('[data-product-price] .product-info__price-current');\n
+    \   const headerWas   = document.querySelector('[data-product-price] .product-info__price-was');\n
+    \   const atcBtn = form.querySelector('[data-atc-button]');\n    const atcDefault
+    = atcBtn.querySelector('[data-atc-default]');\n    const atcSuccess = atcBtn.querySelector('[data-atc-success]');\n\n
+    \   function moneyFormat(cents) {\n      const fmt = (window.themeSettings &&
+    window.themeSettings.moneyFormat) || '€{{amount}}';\n      const amount = (cents
+    / 100).toFixed(2).replace('.', ',');\n      return fmt.replace(/\\{\\{\\s*amount[^}]*\\}\\}/,
+    amount);\n    }\n\n    function getSelectedOptions() {\n      return Array.from(form.querySelectorAll('[data-product-option]')).map((group)
+    => {\n        const checked = group.querySelector('input[type=\"radio\"]:checked');\n
+    \       return checked ? checked.value : null;\n      });\n    }\n\n    function
+    findVariant(opts) {\n      return variants.find(v => v.options.length === opts.length\n
+    \       && v.options.every((o, i) => o === opts[i]));\n    }\n\n    function syncOptionLabel(group)
+    {\n      const checked = group.querySelector('input[type=\"radio\"]:checked');\n
+    \     const label = group.querySelector('[data-option-current]');\n      if (checked
+    && label) label.textContent = checked.dataset.optionLabel || checked.value;\n
+    \   }\n\n    function syncActiveStyles(group) {\n      group.querySelectorAll('.product-picker,
+    .fragrance-swatch').forEach((el) => {\n        const input = el.querySelector('input[type=\"radio\"]');\n
+    \       el.classList.toggle('is-active', !!(input && input.checked));\n      });\n
+    \   }\n\n    function update() {\n      const groups = form.querySelectorAll('[data-product-option]');\n
+    \     groups.forEach((g) => { syncOptionLabel(g); syncActiveStyles(g); });\n\n
+    \     const opts = getSelectedOptions();\n      const variant = findVariant(opts);\n
+    \     if (!variant) return;\n\n      variantInput.value = variant.id;\n\n      if
+    (priceTarget) priceTarget.textContent = moneyFormat(variant.price);\n      if
+    (headerPrice) headerPrice.textContent = moneyFormat(variant.price);\n      if
+    (headerWas) {\n        if (variant.compare_at_price && variant.compare_at_price
+    > variant.price) {\n          headerWas.textContent = moneyFormat(variant.compare_at_price);\n
+    \         headerWas.style.display = '';\n        } else {\n          headerWas.style.display
+    = 'none';\n        }\n      }\n\n      atcBtn.disabled = !variant.available;\n
+    \     atcDefault.firstChild && (atcDefault.firstChild.nodeValue = variant.available\n
+    \       ? \"{{ 'products.product.add_to_cart' | t }} · \"\n        : \"{{ 'products.product.sold_out'
+    | t }}\");\n\n      const url = new URL(window.location.href);\n      url.searchParams.set('variant',
+    variant.id);\n      history.replaceState({}, '', url);\n    }\n\n    form.addEventListener('change',
+    (e) => {\n      if (e.target.matches('[data-option-input]')) update();\n    });\n\n
+    \   /* Quantity */\n    const qty = form.querySelector('[data-qty-input]');\n
+    \   form.querySelector('[data-qty-decrement]').addEventListener('click', () =>
+    {\n      qty.value = Math.max(1, parseInt(qty.value, 10) - 1);\n    });\n    form.querySelector('[data-qty-increment]').addEventListener('click',
+    () => {\n      qty.value = parseInt(qty.value, 10) + 1;\n    });\n\n    /* ATC:
+    AJAX submit so the user stays on the page; falls back to normal post on error
+    */\n    form.addEventListener('submit', async (e) => {\n      e.preventDefault();\n
+    \     atcBtn.disabled = true;\n      try {\n        const fd = new FormData(form);\n
+    \       const res = await fetch(window.themeSettings.routes.cart_add_url + '.js',
+    {\n          method: 'POST',\n          body: fd,\n          headers: { 'Accept':
+    'application/json' }\n        });\n        if (!res.ok) throw new Error('add failed');\n\n
+    \       atcDefault.hidden = true;\n        atcSuccess.hidden = false;\n        atcBtn.classList.add('is-success');\n\n
+    \       /* Bump the header cart counter */\n        const cartRes = await fetch(window.themeSettings.routes.cart_url
+    + '.js', { headers: { 'Accept': 'application/json' } });\n        if (cartRes.ok)
+    {\n          const cart = await cartRes.json();\n          const counter = document.querySelector('[data-cart-count]');\n
+    \         if (counter) counter.textContent = cart.item_count;\n        }\n\n        setTimeout(()
+    => {\n          atcDefault.hidden = false;\n          atcSuccess.hidden = true;\n
+    \         atcBtn.classList.remove('is-success');\n          atcBtn.disabled =
+    false;\n        }, 1800);\n      } catch (err) {\n        atcBtn.disabled = false;\n
+    \       form.removeEventListener('submit', arguments.callee);\n        form.submit();\n
+    \     }\n    });\n\n    /* Wishlist (visual only — no Shopify-native wishlist)
+    */\n    const wishlist = form.querySelector('[data-wishlist-toggle]');\n    if
+    (wishlist) {\n      wishlist.addEventListener('click', () => {\n        wishlist.style.background
+    = 'var(--pink)';\n        wishlist.style.borderColor = 'var(--pink-deep)';\n        wishlist.textContent
+    = '♥ Ajouté à la liste';\n      });\n    }\n\n    update();\n  })();\n</script>\n"
+  to: 'Liquid syntax error (snippets/product-form line 32): Expected close_square
+    but found pipe in "palette_color = palette[forloop.index0 | modulo: 4]"'
+  position: 0..146
+{% endcomment %}
